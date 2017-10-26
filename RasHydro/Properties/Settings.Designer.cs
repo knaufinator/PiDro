@@ -22,29 +22,5 @@ namespace HydroTest.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double ph7 {
-            get {
-                return ((double)(this["ph7"]));
-            }
-            set {
-                this["ph7"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
-        public double ph4 {
-            get {
-                return ((double)(this["ph4"]));
-            }
-            set {
-                this["ph4"] = value;
-            }
-        }
     }
 }

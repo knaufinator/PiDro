@@ -15,10 +15,8 @@ using System.Xml;
 namespace HydroTest
 {
     public partial class MainWindow : Form
-    {
-        delegate void TextBoxDelegate(string message);
+    {        
         AppSettings settings = new AppSettings();
-
       
         //this will be in xml config later...
         //ports that will be opened up, internal for when we have multiple pis, and want to just use dif port mappings
@@ -28,6 +26,8 @@ namespace HydroTest
         public MainWindow()
         {
             InitializeComponent();
+            this.Size = new Size(800, 480);
+            //this.max
            // setupUPNP();
 
             TimerComponent timerComponent = new TimerComponent(300, 5);

@@ -14,11 +14,11 @@ namespace HydroTest
         XmlDocument settings;
  
         public static String settingsFileName = "settings.xml";
+        private static String settingNodeName = "Settings";
 
         public AppSettings()
         {
-            //check to see if settings file exists, if not create it and fill it with defaults
-
+            //if no settings file exists, create it.
             if (!File.Exists(settingsFileName))
             {
                 CreateSettings();
@@ -40,7 +40,7 @@ namespace HydroTest
         public String GetSetting(String nodeName,String attributeName,String defaultSetting)
         {
             String result = defaultSetting;
-            XmlNode nodeFound = FindNode(settings["Settings"], nodeName);
+            XmlNode nodeFound = FindNode(settings[settingNodeName], nodeName);
             XmlAttribute xmlAttribute;
             if (nodeFound != null)
             {
@@ -71,7 +71,7 @@ namespace HydroTest
         private XmlNode CreateNode(String name)
         {
             XmlNode node = settings.CreateNode(XmlNodeType.Element, name, null);
-            settings["Settings"].AppendChild(node);
+            settings[settingNodeName].AppendChild(node);
             return node;
         }
 
@@ -92,16 +92,15 @@ namespace HydroTest
         private void CreateSettings()
         {
             XmlDocument settings = new XmlDocument();
-            XmlElement root = settings.CreateElement("Settings");
+            XmlElement root = settings.CreateElement(settingNodeName);
             settings.AppendChild(root);            
             settings.Save(settingsFileName);
         }
 
         internal void SaveSetting(string node, string setting, string value)
         {
-            //XmlElement formData = (XmlElement)settings.SelectSingleNode(node);
-
-            XmlNode settingNode = FindNode(settings["Settings"], node);
+            XmlNode settingNode = FindNode(settings[settingNodeName], node);
+         
             //if node if null, create one,
             if (settingNode == null)
             {
@@ -115,8 +114,10 @@ namespace HydroTest
                 CreateAttribute(settingNode, setting, value);
             }
 
+            //set attribute value
             xmlAttribute.Value = value;
 
+            //save settings file
             settings.Save(settingsFileName);
         }
     }
