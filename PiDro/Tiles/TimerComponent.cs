@@ -41,9 +41,11 @@ namespace HydroTest.Tiles
             {
                 Pi.Gpio.Pin26.PinMode = GpioPinDriveMode.Output;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine("Timer Relay Pin setup Failed: " + e.Message);
             }
+
             //update the clock readout one a sec
             updateTimer = new Timer();
             updateTimer.Interval = 1000;

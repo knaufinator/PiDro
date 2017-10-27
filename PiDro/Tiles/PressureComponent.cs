@@ -19,15 +19,15 @@ namespace HydroTest.Tiles
         AppSettings settings = AppSettings.Instance;
 
         double pressure110;
-        double pressure70;
+        double pressure80;
 
         String pressureNode = "Pressure";
         String pressure110Setting = "Pressure110";
-        String pressure70Setting = "Pressure70";
+        String pressure80Setting = "Pressure80";
 
         public PressureComponent( )
         {
-            LoadSetting();                    
+            LoadSettings();                    
             pressureTile.button1.Click += Button1_Click;
 
             try
@@ -45,6 +45,12 @@ namespace HydroTest.Tiles
             updateTimer.Start();
         }
 
+        private void LoadSettings()
+        {
+            Double.TryParse(settings.GetSetting(pressureNode, pressure80Setting, "1.0"), out pressure80);
+            Double.TryParse(settings.GetSetting(pressureNode, pressure110Setting, "3.0"), out pressure110);
+        }
+
         private void Button1_Click(object sender, EventArgs e)
         {
             calibratePressureAuto();
@@ -54,23 +60,22 @@ namespace HydroTest.Tiles
         {
             double result = 0.0;
 
-            if (pressure70 > 0 & pressure110 > 0)
+            if (pressure80 > 0 & pressure110 > 0)
             {
-                double[] x = { pressure70, pressure110 };
-                double[] y = { 70, 110 };
-
+                double[] x = { pressure80, pressure110 };
+                double[] y = { 80, 110 };
+                
                 try
                 {                            
                     Tuple<double, double> p = Fit.Line(x, y);
-                    double c = p.Item1; // == 10; intercept
-                    double m = p.Item2; // == 0.5; slope
+                    double c = p.Item1;
+                    double m = p.Item2;
 
                     //y = mx + c;
                     result = m * this.getPressureVoltage() + c;
                 }
                 catch (Exception e)
-                {
-                    String test = "";
+                {                    
                 }
             }
           
@@ -80,7 +85,7 @@ namespace HydroTest.Tiles
         public void calibratePressureAuto()
         {
             Double phV = getPressureVoltage();
-            Double vCutoff = 1.5;?
+            Double vCutoff = 2.8;
 
             if (phV >= vCutoff)
             {
@@ -89,11 +94,10 @@ namespace HydroTest.Tiles
             }
             else
             {
-                pressure70 = phV;
-                settings.SaveSetting(pressureNode, pressure70Setting, phV.ToString());
+                pressure80 = phV;
+                settings.SaveSetting(pressureNode, pressure80Setting, phV.ToString());
             }
         }
-
      
         public Double getPressureVoltage()
         {
@@ -117,32 +121,7 @@ namespace HydroTest.Tiles
 
             return result;
         }
-
-        private void PH_pump_up(object sender, EventArgs e)
-        {
-            //turn off pump
-            try
-            {
-                Pi.Gpio.Pin26.Write(false);
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        private void PH_pump_down(object sender, EventArgs e)
-        {
-            //turn off pump
-            try
-            {
-                Pi.Gpio.Pin13.Write(false);
-            }
-            catch (Exception)
-            {
-            }
-
-        }
-
+        
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
             pressureTile.set(getPressure().ToString("N1"));

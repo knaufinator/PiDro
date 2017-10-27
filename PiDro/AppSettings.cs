@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows.Forms;
 using System.Xml;
 
 /// <summary>
@@ -14,6 +15,7 @@ namespace HydroTest
 
         private XmlDocument _settings;
         private static String _settingsFileName = "settings.xml";
+        private String _settingsPath = Directory.GetCurrentDirectory() + "/" + _settingsFileName;
         private static String _settingNodeName = "Settings";
 
         public static AppSettings Instance
@@ -33,30 +35,50 @@ namespace HydroTest
               
         AppSettings()
         {
-            //if no settings file exists, create it.
-            if (!File.Exists(_settingsFileName))
+            try
             {
-                CreateSettings();
-            }
+                //if no settings file exists, create it.
+                if (!File.Exists(_settingsPath))
+                {
+                    CreateSettings();
+                }
 
-            LoadSettings();
+                LoadSettings();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("AppSettings init: "+e.Message);
+            }
         }
 
         private XmlNode FindNode(XmlElement list, string nodeName)
-        {       
-            foreach (XmlNode node in list)
+        {
+            try
             {
-                if (node.Name.Equals(nodeName)) return node;
-            }
+                foreach (XmlNode node in list)
+                {
+                    Console.WriteLine("FindNode "+ nodeName + " next:" + node.ToString());
+                    if (node.Name.Equals(nodeName)) return node;
+                }
 
+            }
+            catch (Exception er)
+            {
+                Console.WriteLine("Find Node " +er.Message);
+            }
+            
             return null;
         }
 
         public String GetSetting(String nodeName,String attributeName,String defaultSetting)
         {
+
+            Console.WriteLine("get Setting " + nodeName + "Settings null?: "+ (_settings == null).ToString());
+
             String result = defaultSetting;
             XmlNode nodeFound = FindNode(_settings[_settingNodeName], nodeName);
             XmlAttribute xmlAttribute;
+
             if (nodeFound != null)
             {
                 xmlAttribute = FindAttribute(nodeFound.Attributes, attributeName);
@@ -101,15 +123,18 @@ namespace HydroTest
         private void LoadSettings()
         {
             _settings = new XmlDocument();
-            _settings.Load(_settingsFileName);
+            _settings.Load(_settingsPath);
+            Console.WriteLine(_settingsPath + " Loaded");
         }
 
         private void CreateSettings()
         {
+            Console.WriteLine("Creating settings file");
             XmlDocument settings = new XmlDocument();
             XmlElement root = settings.CreateElement(_settingNodeName);
-            settings.AppendChild(root);            
+            settings.AppendChild(root);      
             settings.Save(_settingsFileName);
+            Console.WriteLine("Created settings file: "+ _settingsFileName);
         }
 
         internal void SaveSetting(string node, string setting, string value)
@@ -126,14 +151,14 @@ namespace HydroTest
             XmlAttribute xmlAttribute = FindAttribute(settingNode.Attributes, setting);
             if (xmlAttribute == null)
             {
-                CreateAttribute(settingNode, setting, value);
+                xmlAttribute = CreateAttribute(settingNode, setting, value);
             }
 
             //set attribute value
             xmlAttribute.Value = value;
 
             //save settings file
-            _settings.Save(_settingsFileName);
+            _settings.Save(_settingsPath);
         }
     }
 }

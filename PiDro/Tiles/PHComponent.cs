@@ -88,15 +88,14 @@ namespace HydroTest.Tiles
                 try
                 {                            
                     Tuple<double, double> p = Fit.Line(x, y);
-                    double c = p.Item1; // == 10; intercept
-                    double m = p.Item2; // == 0.5; slope
+                    double c = p.Item1;
+                    double m = p.Item2;
 
                     //y = mx + c;
                     result = m * this.getPHVoltage() + c;
                 }
                 catch (Exception e)
                 {
-                    String test = "";
                 }
             }
           

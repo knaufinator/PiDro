@@ -1,4 +1,5 @@
-﻿using HydroTest.Tiles;
+﻿using HydroTest.Dialogs;
+using HydroTest.Tiles;
 using Mono.Nat;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace HydroTest
 {
     public partial class MainWindow : Form
     {
-        AppSettings settings = AppSettings.Instance;
+       // AppSettings settings = AppSettings.Instance;
 
         //this will be in xml config later...
         //ports that will be opened up, internal for when we have multiple pis, and want to just use dif port mappings
@@ -26,23 +27,25 @@ namespace HydroTest
         public MainWindow()
         {
             InitializeComponent();
-            this.Size = new Size(800, 480);
+            //this.FormBorderStyle = FormBorderStyle.None;
             //this.WindowState = FormWindowState.Maximized;
-
-            // setupUPNP();//uncomment to make upnp forward your ports
+           //setupUPNP();//uncomment to make upnp forward your ports
 
 
             //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
-            PHComponent pHComponent = new PHComponent();
-            PressureComponent pressureComponent = new PressureComponent();
-            TemperatureComponent temperatureComponent = new TemperatureComponent();
+
+            
+
+           // PHComponent pHComponent = new PHComponent();
+           // PressureComponent pressureComponent = new PressureComponent();
+          //  TemperatureComponent temperatureComponent = new TemperatureComponent();
 
            
-            this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
+             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
+          //  this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+          //  this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
+          //  this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
@@ -86,6 +89,16 @@ namespace HydroTest
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsForm settingsForm = new SettingsForm();
+            
+
+            settingsForm.Show();
+
+
         }
     }    
 }
