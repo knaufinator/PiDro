@@ -1,18 +1,21 @@
-# PyDro
+# PiDro
 
 Raspberry pi 3 Hydronics monitor and controller
 
 Mono app, using tiles to represent monitor/control items,
 
-most items not built yet...
+Upnp port forwarding, for web service, ssh, vnc 
 
-upnp port opening, for web service, ssh, vnc 
+WAMPv2 sharp web service to feed android monitor app for real time feed on the go.
 
-PH monitor
-PH control
-temperature
-pump timer
 
-WAMP sharp web service soon, to feed android monitor app.
+
+Dymanic adding of modules such as 
+-PH monitor - analog voltage from a/d to PH probe circuit
+-PH control - relay controls to increment ph up /down
+-Temperature probe (DS18B20)
+-Pump timer - control relay output, turn item on/off 
+
+
 
 ![ScreenShot](/screenshots/main.png)
