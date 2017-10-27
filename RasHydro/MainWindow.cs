@@ -15,9 +15,9 @@ using System.Xml;
 namespace HydroTest
 {
     public partial class MainWindow : Form
-    {        
-        AppSettings settings = new AppSettings();
-      
+    {
+        AppSettings settings = AppSettings.Instance;
+
         //this will be in xml config later...
         //ports that will be opened up, internal for when we have multiple pis, and want to just use dif port mappings
         int[] externalPorts = new int[] { 8123, 5901, 5800, 22 };
@@ -28,8 +28,10 @@ namespace HydroTest
             InitializeComponent();
             this.Size = new Size(800, 480);
             //this.max
-           // setupUPNP();
+           // setupUPNP();//uncomment to make upnp grab forward your ports
 
+
+            //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
             PHComponent pHComponent = new PHComponent();
             PressureComponent pressureComponent = new PressureComponent();

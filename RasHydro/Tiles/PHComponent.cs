@@ -17,7 +17,7 @@ namespace HydroTest.Tiles
         I2CDevice myDevice;
         Timer phUp = new Timer();
         Timer phDown = new Timer();
-        AppSettings settings = new AppSettings();
+        AppSettings settings = AppSettings.Instance;
         double ph4;
         double ph7;
 

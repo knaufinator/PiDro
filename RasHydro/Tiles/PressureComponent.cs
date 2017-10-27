@@ -15,8 +15,8 @@ namespace HydroTest.Tiles
 
         Timer updateTimer;
         I2CDevice myDevice;
-       
-        AppSettings settings = new AppSettings();
+
+        AppSettings settings = AppSettings.Instance;
 
         double pressure110;
         double pressure70;
