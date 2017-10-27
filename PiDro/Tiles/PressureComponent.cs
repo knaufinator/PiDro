@@ -27,9 +27,7 @@ namespace HydroTest.Tiles
 
         public PressureComponent( )
         {
-            //LoadSetting();          
-          
-
+            LoadSetting();                    
             pressureTile.button1.Click += Button1_Click;
 
             try
@@ -50,13 +48,7 @@ namespace HydroTest.Tiles
         private void Button1_Click(object sender, EventArgs e)
         {
             calibratePressureAuto();
-        }
-
-        private void SaveSettings()
-        {
-            settings.SaveSetting(pressureNode, pressure70Setting, pressure70.ToString());
-            settings.SaveSetting(pressureNode, pressure110Setting, pressure110.ToString());
-        }
+        }  
         
         public Double getPressure()
         {
@@ -88,7 +80,7 @@ namespace HydroTest.Tiles
         public void calibratePressureAuto()
         {
             Double phV = getPressureVoltage();
-            Double vCutoff = 1.5;
+            Double vCutoff = 1.5;?
 
             if (phV >= vCutoff)
             {

@@ -27,8 +27,9 @@ namespace HydroTest
         {
             InitializeComponent();
             this.Size = new Size(800, 480);
-            //this.max
-           // setupUPNP();//uncomment to make upnp grab forward your ports
+            //this.WindowState = FormWindowState.Maximized;
+
+            // setupUPNP();//uncomment to make upnp forward your ports
 
 
             //create dynamic builder, from config xml, generate each component
@@ -37,7 +38,7 @@ namespace HydroTest
             PressureComponent pressureComponent = new PressureComponent();
             TemperatureComponent temperatureComponent = new TemperatureComponent();
 
-            this.WindowState = FormWindowState.Maximized; 
+           
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
@@ -62,10 +63,12 @@ namespace HydroTest
             {
                 INatDevice device = args.Device;
 
+                //remove existing port maps that exist on the ports we want
                 foreach (Mapping portMap in device.GetAllMappings())
                     if(externalPorts.Contains(portMap.PublicPort))
                         device.DeletePortMap(portMap);
                 
+                //add the ports we want for our IP
                 foreach (int port in externalPorts)
                     device.CreatePortMap(new Mapping(Protocol.Tcp, port, port));
             }
