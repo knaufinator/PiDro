@@ -1,4 +1,5 @@
-# RaspberryHydroponics
+# PyDro
+
 Raspberry pi 3 Hydronics monitor and controller
 
 Mono app, using tiles to represent monitor/control items,
