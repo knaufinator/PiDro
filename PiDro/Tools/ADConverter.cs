@@ -3,44 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
-namespace Pidro
+namespace Pidro.Tools
 {
-    public sealed class ADConverter
+    public class ADConverter
     {
         public I2CDevice myDevice;
-        private static ADConverter instance = null;
-        private static readonly object padlock = new object();
 
-        public static ADConverter Instance
-        {
-            get
-            {
-                lock (padlock)
-                {
-                    if (instance == null)
-                    {
-                        instance = new ADConverter();
-                    }
-                    return instance;
-                }
-            }
-        }
-
-
-        ADConverter()
+        public ADConverter(int deviceID)
         {
             try
             {
-               
+                myDevice = Pi.I2C.AddDevice(deviceID);
             }
             catch (Exception e)
             {
-               
+                Console.WriteLine("Error Ad Converter init: "+ e.Message );
             }
         }
-
 
         public Double GetADVoltage(int sensorId)
         {

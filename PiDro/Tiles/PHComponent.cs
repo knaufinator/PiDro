@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using System.Xml;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
-
+using Pidro.Tools;
 
 namespace Pidro.Tiles
 {
@@ -14,7 +14,9 @@ namespace Pidro.Tiles
         PHTile phTile = new PHTile();
 
         Timer updateTimer;
-        I2CDevice myDevice;
+        int sensorId = 0;
+
+        ADConverter aDConverter;
         Timer phUp = new Timer();
         Timer phDown = new Timer();
         AppSettings settings = AppSettings.Instance;
@@ -25,9 +27,10 @@ namespace Pidro.Tiles
         String ph7Setting = "PH7";
         String ph4Setting = "PH4";
 
-        public PHComponent( )
+        public PHComponent(ADConverter aDConverter)
         {
-            LoadSettings();          
+            LoadSettings();
+            this.aDConverter = aDConverter;
 
             phTile.button1.Click += Button1_Click;
             phTile.button2.Click += Up_Click;
@@ -39,14 +42,6 @@ namespace Pidro.Tiles
             phDown.Interval = 2000;
             phDown.Tick += PH_pump_down;
 
-            try
-            {
-                myDevice = Pi.I2C.AddDevice(0x48);          
-            }
-            catch(Exception e)
-            {
-            }
-    
             //update the clock readout one a sec
             updateTimer = new Timer();
             updateTimer.Interval = 1000;
@@ -70,6 +65,8 @@ namespace Pidro.Tiles
             calibratePHAuto();
         }
 
+        //this slope function should be consolodated somewhere..
+
         public Double getPH()
         {
             double result = 0.0;
@@ -84,9 +81,9 @@ namespace Pidro.Tiles
                     Tuple<double, double> p = Fit.Line(x, y);
                     double c = p.Item1;
                     double m = p.Item2;
-
+                    
                     //y = mx + c;
-                    result = m * this.getPHVoltage() + c;
+                    result = m * aDConverter.GetADVoltage(sensorId) + c;
                 }
                 catch (Exception e)
                 {
@@ -98,7 +95,7 @@ namespace Pidro.Tiles
 
         public void calibratePHAuto()
         {
-            Double phV = getPHVoltage();
+            Double phV = aDConverter.GetADVoltage(sensorId);
             Double vCutoff = 1.5;
 
             if (phV >= vCutoff)
@@ -113,35 +110,11 @@ namespace Pidro.Tiles
             }
         }
 
-        public Double getPHVoltage()
-        {
-            double measuredVoltage = 5.0;
-            double adSteps = 255;
-            double result = 0.0;
-            byte buffer;
-            int sensorId = 0;
-            try
-            {
-                myDevice.Write((byte)(0x40 | (sensorId & 3)));
-                buffer = (byte)myDevice.Read();
-                buffer = (byte)myDevice.Read();
-
-                short unsignedValue = (short)((short)0x00FF & buffer);
-                result = unsignedValue * measuredVoltage / adSteps;
-            }
-            catch (Exception e)
-            {
-              
-            }
-
-            return result;
-        }
-
         private void Down_Click(object sender, EventArgs e)
         {
             try
             {
-                Pi.Gpio.Pin13.Write(true);
+               // Pi.Gpio.Pin13.Write(true);
             }
             catch (Exception)
             {
@@ -154,7 +127,7 @@ namespace Pidro.Tiles
         {
             try
             {
-                Pi.Gpio.Pin26.Write(true);
+              //  Pi.Gpio.Pin26.Write(true);
             }
             catch (Exception)
             {

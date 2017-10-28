@@ -13,12 +13,13 @@ namespace Pidro.Tiles
         {
             InitializeComponent();
             label1.Text = name;
-            label1.ForeColor = ComponentBase.colorPallet1;
+            
             triggeredOnIcon = new Bitmap(Properties.Resources.on_icon);
             triggeredOffIcon = new Bitmap(Properties.Resources.off_icon);
             panel1.BackColor = ComponentBase.colorPallet4;  
             textBox1.BackColor = ComponentBase.colorPallet1;
-            textBox1.ForeColor = ComponentBase.colorPallet5;            
+            textBox1.ForeColor = ComponentBase.colorPallet5;
+            label1.ForeColor = ComponentBase.colorPallet3;
         }
 
         public void set(String time,Boolean triggered)

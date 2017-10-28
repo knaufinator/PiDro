@@ -20,7 +20,7 @@ namespace Pidro.Tiles
             textBox1.BackColor = ComponentBase.colorPallet1;
             textBox1.ForeColor = ComponentBase.colorPallet5;
             button1.BackColor = ComponentBase.colorPallet3;
-            label1.ForeColor = ComponentBase.colorPallet1;
+            label1.ForeColor = ComponentBase.colorPallet3;
         }
 
         public void set(String pressure)

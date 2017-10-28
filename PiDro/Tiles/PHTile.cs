@@ -15,7 +15,7 @@ namespace Pidro.Tiles
             button1.BackColor = ComponentBase.colorPallet3;
             button2.BackColor = ComponentBase.colorPallet3;
             button3.BackColor = ComponentBase.colorPallet3;
-            label1.ForeColor = ComponentBase.colorPallet1;
+            label1.ForeColor = ComponentBase.colorPallet3;
         }
 
         public void set(String ph)

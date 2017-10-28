@@ -4,7 +4,7 @@ using System;
 using System.Windows.Forms;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
-
+using Pidro.Tools;
 
 namespace Pidro.Tiles
 {
@@ -13,10 +13,10 @@ namespace Pidro.Tiles
         PressureTile pressureTile = new PressureTile();
 
         Timer updateTimer;
-        I2CDevice myDevice;
+        ADConverter aDConverter;
 
         AppSettings settings = AppSettings.Instance;
-
+        int sensorId = 1;
         double pressure110;
         double pressure80;
 
@@ -24,18 +24,10 @@ namespace Pidro.Tiles
         String pressure110Setting = "Pressure110";
         String pressure80Setting = "Pressure80";
 
-        public PressureComponent( )
+        public PressureComponent(ADConverter aDConverter)
         {
             LoadSettings();                    
             pressureTile.button1.Click += Button1_Click;
-
-            try
-            {
-                myDevice = Pi.I2C.AddDevice(0x48);          
-            }
-            catch(Exception e)
-            {
-            }
     
             //update the clock readout one a sec
             updateTimer = new Timer();
@@ -71,7 +63,7 @@ namespace Pidro.Tiles
                     double m = p.Item2;
 
                     //y = mx + c;
-                    result = m * this.getPressureVoltage() + c;
+                    result = m * aDConverter.GetADVoltage(sensorId) + c;
                 }
                 catch (Exception e)
                 {                    
@@ -84,7 +76,7 @@ namespace Pidro.Tiles
         public void calibratePressureAuto()
         {
            
-            Double phV = getPressureVoltage();
+            Double phV = aDConverter.GetADVoltage(sensorId);
             Double vCutoff = 2.8;
 
             Console.WriteLine("Calibrating Pressure: " + phV.ToString());
@@ -100,30 +92,7 @@ namespace Pidro.Tiles
                 settings.SaveSetting(pressureNode, pressure80Setting, phV.ToString());
             }
         }
-     
-        public Double getPressureVoltage()
-        {
-            double measuredVoltage = 5.0;
-            double adSteps = 255;
-            double result = 0.0;
-            byte buffer;
-            int sensorId = 1;
-            try
-            {
-                myDevice.Write((byte)(0x40 | (sensorId & 3)));
-                buffer = (byte)myDevice.Read();
-                buffer = (byte)myDevice.Read();
-                short unsignedValue = (short)((short)0x00FF & buffer);
-                result = unsignedValue * measuredVoltage / adSteps;
-            }
-            catch (Exception e)
-            {
-              
-            }
 
-            return result;
-        }
-        
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
             pressureTile.set(getPressure().ToString("N1"));

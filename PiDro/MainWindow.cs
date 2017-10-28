@@ -4,6 +4,7 @@ using Mono.Nat;
 using System;
 using System.Linq;
 using System.Windows.Forms;
+using Pidro.Tools;
 
 namespace Pidro
 {
@@ -21,13 +22,14 @@ namespace Pidro
             InitializeComponent();
             //this.FormBorderStyle = FormBorderStyle.None;
             //this.WindowState = FormWindowState.Maximized;
-        //   setupUPNP();//uncomment to make upnp forward your ports
+            //   setupUPNP();//uncomment to make upnp forward your ports
 
-
+            ADConverter aDConverter = new ADConverter(0x48);
+            
             //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
-            PHComponent pHComponent = new PHComponent();
-            PressureComponent pressureComponent = new PressureComponent();
+            PHComponent pHComponent = new PHComponent(aDConverter);
+            PressureComponent pressureComponent = new PressureComponent(aDConverter);
             TemperatureComponent temperatureComponent = new TemperatureComponent();
 
              this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
