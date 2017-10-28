@@ -84,8 +84,11 @@ namespace HydroTest.Tiles
 
         public void calibratePressureAuto()
         {
+           
             Double phV = getPressureVoltage();
             Double vCutoff = 2.8;
+
+            Console.WriteLine("Calibrating Pressure: " + phV.ToString());
 
             if (phV >= vCutoff)
             {
@@ -105,10 +108,11 @@ namespace HydroTest.Tiles
             double adSteps = 255;
             double result = 0.0;
             byte buffer;
-            int sensorId = 0;
+            int sensorId = 1;
             try
             {
                 myDevice.Write((byte)(0x40 | (sensorId & 3)));
+                buffer = (byte)myDevice.Read();
                 buffer = (byte)myDevice.Read();
                 short unsignedValue = (short)((short)0x00FF & buffer);
                 result = unsignedValue * measuredVoltage / adSteps;
@@ -123,7 +127,7 @@ namespace HydroTest.Tiles
         
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            pressureTile.set(getPressureVoltage().ToString("N1"));
+            pressureTile.set(getPressure().ToString("N1"));
         }
     
         public System.Windows.Forms.Control GetTile()
