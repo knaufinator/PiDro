@@ -26,7 +26,9 @@ namespace Pidro.Tiles
 
         public PressureComponent(ADConverter aDConverter)
         {
-            LoadSettings();                    
+            
+            LoadSettings();
+            this.aDConverter = aDConverter;
             pressureTile.button1.Click += Button1_Click;
     
             //update the clock readout one a sec
@@ -50,24 +52,13 @@ namespace Pidro.Tiles
         public Double getPressure()
         {
             double result = 0.0;
-
+            
             if (pressure80 > 0 & pressure110 > 0)
             {
                 double[] x = { pressure80, pressure110 };
                 double[] y = { 80, 110 };
-                
-                try
-                {                            
-                    Tuple<double, double> p = Fit.Line(x, y);
-                    double c = p.Item1;
-                    double m = p.Item2;
 
-                    //y = mx + c;
-                    result = m * aDConverter.GetADVoltage(sensorId) + c;
-                }
-                catch (Exception e)
-                {                    
-                }
+                result = ADConverter.Interpolate(x,y,aDConverter.GetADVoltage(sensorId));
             }
           
             return result;

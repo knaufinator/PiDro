@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MathNet.Numerics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -46,6 +47,27 @@ namespace Pidro.Tools
             {
                 Console.WriteLine("AD read error: " + e.Message);
             }
+
+            return result;
+        }
+
+        public static double Interpolate(double[] x, double[] y, double interpolateValue)
+        {
+            double result = 0.0;
+            
+            try
+            {
+                Tuple<double, double> p = Fit.Line(x, y);
+                double c = p.Item1;
+                double m = p.Item2;
+
+                //y = mx + c;
+                result = m * interpolateValue + c;
+            }
+            catch (Exception e)
+            {
+            }
+            
 
             return result;
         }

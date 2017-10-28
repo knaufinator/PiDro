@@ -76,18 +76,7 @@ namespace Pidro.Tiles
                 double[] x = { ph4, ph7 };
                 double[] y = { 4, 7 };
 
-                try
-                {                            
-                    Tuple<double, double> p = Fit.Line(x, y);
-                    double c = p.Item1;
-                    double m = p.Item2;
-                    
-                    //y = mx + c;
-                    result = m * aDConverter.GetADVoltage(sensorId) + c;
-                }
-                catch (Exception e)
-                {
-                }
+                result = ADConverter.Interpolate(x, y, aDConverter.GetADVoltage(sensorId));
             }
           
             return result;
