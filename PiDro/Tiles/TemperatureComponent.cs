@@ -1,6 +1,9 @@
 ﻿using HydroTest.Properties;
+using HydroTest.Tools;
 using MathNet.Numerics;
 using System;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
 using Unosquare.RaspberryIO;
@@ -11,33 +14,54 @@ namespace HydroTest.Tiles
 {
     public class TemperatureComponent : ComponentInterface
     {
-        TemperatureTile pressureTile = new TemperatureTile();
-
-      //  Timer updateTimer;
-        //I2CDevice myDevice;
+        TemperatureTile temperatureTile = new TemperatureTile();
+        Timer updateTimer;
 
         public TemperatureComponent( )
         {
+            //update the clock readout one a sec
+            updateTimer = new Timer();
+            updateTimer.Interval = 1000;
+            updateTimer.Tick += UpdateTimer_Tick;
+            updateTimer.Start();
+        }
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            temperatureTile.Set(GetTemp().ToString("N1"));
+        }
 
-     
+        private Double GetTemp()
+        {
+            Double result = 0.0;
+
             try
             {
-              //  myDevice = Pi.I2C.AddDevice(0x48);          
+                DirectoryInfo devicesDir = new DirectoryInfo("/sys/bus/w1/devices");
+
+                //address
+                String address = "28-01161b0ab2ee";
+
+                foreach (var deviceDir in devicesDir.EnumerateDirectories(address))
+                {
+                    var w1slavetext =
+                        deviceDir.GetFiles("w1_slave").FirstOrDefault().OpenText().ReadToEnd();
+                    string temptext =
+                        w1slavetext.Split(new string[] { "t=" }, StringSplitOptions.RemoveEmptyEntries)[1];
+
+                    return ConvertTemp.ConvertCelsiusToFahrenheit(double.Parse(temptext) / 1000);
+                }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
+                Console.WriteLine(e.Message);   
             }
-    
-            //update the clock readout one a sec
-            //updateTimer = new Timer();
-            //updateTimer.Interval = 1000;
-            //updateTimer.Tick += UpdateTimer_Tick;
-            //updateTimer.Start();
+
+            return result;
         }
      
         public System.Windows.Forms.Control GetTile()
         {
-            return pressureTile;
+            return temperatureTile;
         }
     }    
 }

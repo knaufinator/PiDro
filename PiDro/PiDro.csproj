@@ -11,6 +11,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -23,7 +24,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -106,6 +106,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettings.cs" />
+    <Compile Include="Controls\ArcGauge.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ArcGauge.Designer.cs">
+      <DependentUpon>ArcGauge.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ArcTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ArcTest.Designer.cs">
+      <DependentUpon>ArcTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,6 +162,13 @@
     <Compile Include="Tiles\TimerRelayTile.Designer.cs">
       <DependentUpon>TimerRelayTile.cs</DependentUpon>
     </Compile>
+    <Compile Include="Tools\ConvertTemp.cs" />
+    <EmbeddedResource Include="Controls\ArcGauge.resx">
+      <DependentUpon>ArcGauge.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ArcTest.resx">
+      <DependentUpon>ArcTest.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </EmbeddedResource>

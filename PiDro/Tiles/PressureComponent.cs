@@ -105,12 +105,11 @@ namespace HydroTest.Tiles
             double adSteps = 255;
             double result = 0.0;
             byte buffer;
-
+            int sensorId = 0;
             try
             {
-                myDevice.Write((byte)(0x40 | (0 & 3)));
+                myDevice.Write((byte)(0x40 | (sensorId & 3)));
                 buffer = (byte)myDevice.Read();
-                
                 short unsignedValue = (short)((short)0x00FF & buffer);
                 result = unsignedValue * measuredVoltage / adSteps;
             }
@@ -124,7 +123,7 @@ namespace HydroTest.Tiles
         
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            pressureTile.set(getPressure().ToString("N1"));
+            pressureTile.set(getPressureVoltage().ToString("N1"));
         }
     
         public System.Windows.Forms.Control GetTile()

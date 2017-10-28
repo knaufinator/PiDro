@@ -12,7 +12,6 @@ namespace HydroTest.Tiles
 {
     public partial class TemperatureTile : UserControl
     {
-      
         public TemperatureTile()
         {
             InitializeComponent();
@@ -22,14 +21,9 @@ namespace HydroTest.Tiles
             label1.ForeColor = ComponentBase.colorPallet1;
         }
 
-        public void set(String pressure)
+        public void Set(String temperature)
         {
-            textBox1.Text = pressure;
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
+            textBox1.Text = temperature;
         }
     }
 }

@@ -34,18 +34,14 @@ namespace HydroTest
 
             //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
+            PHComponent pHComponent = new PHComponent();
+            PressureComponent pressureComponent = new PressureComponent();
+            TemperatureComponent temperatureComponent = new TemperatureComponent();
 
-            
-
-           // PHComponent pHComponent = new PHComponent();
-           // PressureComponent pressureComponent = new PressureComponent();
-          //  TemperatureComponent temperatureComponent = new TemperatureComponent();
-
-           
              this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
-          //  this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-          //  this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-          //  this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
+            this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+            this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
+             this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
         }
 
         private void CloseButton_Click(object sender, EventArgs e)
@@ -99,6 +95,12 @@ namespace HydroTest
             settingsForm.Show();
 
 
+        }
+
+        private void arcTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ArcTest arcTest = new ArcTest();
+            arcTest.Show();
         }
     }    
 }

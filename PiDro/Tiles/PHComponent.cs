@@ -27,7 +27,7 @@ namespace HydroTest.Tiles
 
         public PHComponent( )
         {
-            LoadSetting();          
+            LoadSettings();          
 
             phTile.button1.Click += Button1_Click;
             phTile.button2.Click += Up_Click;
@@ -59,16 +59,10 @@ namespace HydroTest.Tiles
             calibratePHAuto();
         }
 
-        private void LoadSetting()
+        private void LoadSettings()
         {
             Double.TryParse(settings.GetSetting(phNode, ph4Setting, "1.0"), out ph4);
             Double.TryParse(settings.GetSetting(phNode, ph7Setting, "2.0"), out ph7);
-        }
-
-        private void SaveSettings()
-        {
-            settings.SaveSetting(phNode, ph4Setting, ph4.ToString());
-            settings.SaveSetting(phNode, ph4Setting, ph7.ToString());
         }
         
         private void Cal_Click(object sender, EventArgs e)
@@ -128,7 +122,7 @@ namespace HydroTest.Tiles
 
             try
             {
-                myDevice.Write((byte)(0x40 | (0 & 3)));
+                myDevice.Write((byte)(0x40 | (1 & 3)));
                 buffer = (byte)myDevice.Read();
                 
                 short unsignedValue = (short)((short)0x00FF & buffer);
@@ -173,7 +167,7 @@ namespace HydroTest.Tiles
             //turn off pump
             try
             {
-                Pi.Gpio.Pin26.Write(false);
+               // Pi.Gpio.Pin26.Write(false);
             }
             catch (Exception)
             {
@@ -185,7 +179,7 @@ namespace HydroTest.Tiles
             //turn off pump
             try
             {
-                Pi.Gpio.Pin13.Write(false);
+               // Pi.Gpio.Pin13.Write(false);
             }
             catch (Exception)
             {
@@ -195,7 +189,7 @@ namespace HydroTest.Tiles
 
         private void UpdateTimer_Tick(object sender, EventArgs e)
         {
-            phTile.set(getPH().ToString("N1"));
+            phTile.set(getPHVoltage().ToString("N1"));
         }
     
         public System.Windows.Forms.Control GetTile()
