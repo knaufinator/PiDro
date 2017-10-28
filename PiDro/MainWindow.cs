@@ -1,19 +1,11 @@
-﻿using HydroTest.Dialogs;
-using HydroTest.Tiles;
+﻿using Pidro.Dialogs;
+using Pidro.Tiles;
 using Mono.Nat;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml;
 
-namespace HydroTest
+namespace Pidro
 {
     public partial class MainWindow : Form
     {
@@ -29,7 +21,7 @@ namespace HydroTest
             InitializeComponent();
             //this.FormBorderStyle = FormBorderStyle.None;
             //this.WindowState = FormWindowState.Maximized;
-           //setupUPNP();//uncomment to make upnp forward your ports
+        //   setupUPNP();//uncomment to make upnp forward your ports
 
 
             //create dynamic builder, from config xml, generate each component
@@ -64,12 +56,20 @@ namespace HydroTest
 
                 //remove existing port maps that exist on the ports we want
                 foreach (Mapping portMap in device.GetAllMappings())
-                    if(externalPorts.Contains(portMap.PublicPort))
+                    if (externalPorts.Contains(portMap.PublicPort))
+                    {
+                        Console.WriteLine("Deleting " + portMap.PublicPort.ToString());
                         device.DeletePortMap(portMap);
-                
+                    }
+
+
                 //add the ports we want for our IP
                 foreach (int port in externalPorts)
+                {   
+                    Console.WriteLine("Creating IP: " + device.LocalAddress.ToString()+ " port: " + port.ToString());
                     device.CreatePortMap(new Mapping(Protocol.Tcp, port, port));
+                }
+                    
             }
             catch (Exception e)
             {
@@ -90,11 +90,7 @@ namespace HydroTest
         private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SettingsForm settingsForm = new SettingsForm();
-            
-
             settingsForm.Show();
-
-
         }
 
         private void arcTestToolStripMenuItem_Click(object sender, EventArgs e)

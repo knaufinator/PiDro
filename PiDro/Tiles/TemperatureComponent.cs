@@ -1,5 +1,5 @@
-﻿using HydroTest.Properties;
-using HydroTest.Tools;
+﻿using Pidro.Properties;
+using Pidro.Tools;
 using MathNet.Numerics;
 using System;
 using System.IO;
@@ -10,7 +10,7 @@ using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
 
-namespace HydroTest.Tiles
+namespace Pidro.Tiles
 {
     public class TemperatureComponent : ComponentInterface
     {

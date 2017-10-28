@@ -1,4 +1,4 @@
-﻿using HydroTest.Properties;
+﻿using Pidro.Properties;
 using MathNet.Numerics;
 using System;
 using System.Windows.Forms;
@@ -7,7 +7,7 @@ using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
 
-namespace HydroTest.Tiles
+namespace Pidro.Tiles
 {
     public class PHComponent : ComponentInterface
     {

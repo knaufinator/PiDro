@@ -6,7 +6,7 @@ using System.Xml;
 /// <summary>
 /// Custom settings xml writer, create and edit settings dynamically.
 /// </summary>
-namespace HydroTest
+namespace Pidro
 {
     public sealed class AppSettings
     {

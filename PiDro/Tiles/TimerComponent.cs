@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Pidro.Tiles;
+using System;
 using System.Windows.Forms;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
-namespace HydroTest.Tiles
+namespace Pidro.Tiles
 {
     public class TimerComponent :ComponentInterface
     {

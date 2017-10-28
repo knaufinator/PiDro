@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace HydroTest.Properties {
+namespace Pidro.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

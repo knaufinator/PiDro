@@ -1,4 +1,4 @@
-﻿namespace HydroTest.Tiles
+﻿namespace Pidro.Tiles
 {
     partial class TimerRelayTile
     {
@@ -60,7 +60,7 @@
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Transparent;
-            this.pictureBox1.Image = global::HydroTest.Properties.Resources.off_icon;
+            this.pictureBox1.Image = global::Pidro.Properties.Resources.off_icon;
             this.pictureBox1.Location = new System.Drawing.Point(10, 72);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(60, 60);

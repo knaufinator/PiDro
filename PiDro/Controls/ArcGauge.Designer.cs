@@ -1,4 +1,4 @@
-﻿namespace HydroTest.Controls
+﻿namespace Pidro.Controls
 {
     partial class ArcGauge
     {

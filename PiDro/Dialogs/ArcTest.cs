@@ -1,4 +1,4 @@
-﻿using HydroTest.Controls;
+﻿using Pidro.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace HydroTest.Dialogs
+namespace Pidro.Dialogs
 {
     public partial class ArcTest : Form
     {

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 
-namespace HydroTest.Controls
+namespace Pidro.Controls
 {
     public partial class ArcGauge : UserControl
     {

@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace HydroTest.Tiles
+namespace Pidro.Tiles
 {
     public partial class PressureTile : UserControl
     {

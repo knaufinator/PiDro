@@ -1,4 +1,4 @@
-﻿namespace HydroTest.Tiles
+﻿namespace Pidro.Tiles
 {
     partial class PHTile
     {

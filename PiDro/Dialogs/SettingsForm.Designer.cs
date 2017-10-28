@@ -1,4 +1,4 @@
-﻿namespace HydroTest.Dialogs
+﻿namespace Pidro.Dialogs
 {
     partial class SettingsForm
     {

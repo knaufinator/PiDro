@@ -1,4 +1,4 @@
-﻿namespace HydroTest
+﻿namespace Pidro
 {
     partial class MainWindow
     {

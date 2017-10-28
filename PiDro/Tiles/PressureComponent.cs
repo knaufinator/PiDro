@@ -1,13 +1,12 @@
-﻿using HydroTest.Properties;
+﻿using Pidro.Properties;
 using MathNet.Numerics;
 using System;
 using System.Windows.Forms;
-using System.Xml;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
 
-namespace HydroTest.Tiles
+namespace Pidro.Tiles
 {
     public class PressureComponent : ComponentInterface
     {

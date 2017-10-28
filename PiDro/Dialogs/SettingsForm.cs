@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace HydroTest.Dialogs
+namespace Pidro.Dialogs
 {
     public partial class SettingsForm : Form
     {
