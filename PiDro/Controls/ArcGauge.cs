@@ -63,7 +63,7 @@ namespace Pidro.Controls
 
                     p.CenterColor = _color1;
                     p.CenterPoint = new PointF(_r.Width / 2f + _r.X, _r.Height / 2f + _r.Y);
-//p.SurroundColors = new Color[] { _color2 };
+                    //p.SurroundColors = new Color[] { _color2 };
 
                     using (Pen pen = new Pen(p, _w))
                         e.Graphics.DrawArc(pen, _r, _sAngle, _swAngle);
@@ -98,8 +98,7 @@ namespace Pidro.Controls
             }
 
         }
-
-
+        
         private float[] CalcPositions(Rectangle rectangle, double w)
         {
             float[] f = new float[5];
@@ -112,6 +111,5 @@ namespace Pidro.Controls
 
             return f;
         }
-
     }
 }
