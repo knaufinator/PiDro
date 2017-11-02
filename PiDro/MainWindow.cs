@@ -10,6 +10,9 @@ using WampSharp.V2;
 using Pidro.Service;
 using WampSharp.V2.Client;
 using SystemEx;
+using WampSharp.V2.Realm;
+using System.Reactive.Subjects;
+using System.Reactive.Linq;
 
 namespace Pidro
 {
@@ -30,7 +33,7 @@ namespace Pidro
             this.WindowState = FormWindowState.Maximized;
 
             //setupUPNP();//uncomment to make upnp forward your ports
-           // setupWampAsync();//testing 
+            SetupWamp();//testing 
 
 
             ADConverter aDConverter = new ADConverter(0x48);
@@ -43,7 +46,7 @@ namespace Pidro
 
             //pin tester, in order to hunt down what pins have relays attached
             UserControl1 test = new UserControl1();
-
+            
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
@@ -51,24 +54,42 @@ namespace Pidro
             this.flowLayoutPanel1.Controls.Add(test);
         }
 
-        private async void setupWampAsync()
-        {
-            const string location = "ws://127.0.0.1:8080/";
+        private void SetupWamp()
+        {          
+            try
+            {
+                string location = "ws://" + NetworkTool.GetLocalIPAddress() +":8080/ws";
+                DefaultWampHost host = new DefaultWampHost(location);
+                host.Open();
+                
+                IWampHostedRealm realm = host.RealmContainer.GetRealmByName("data");
 
-            DefaultWampChannelFactory channelFactory = new DefaultWampChannelFactory();
+                ISubject<int> subject =
+                    realm.Services.GetSubject<int>("com.pidra.data");
 
-            IWampChannel channel = channelFactory.CreateJsonChannel(location, "realm1");
+                int counter = 0;
+                IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0),TimeSpan.FromMilliseconds(1000));
 
-            await channel.Open().ConfigureAwait(false);
-
-            IWebService instance = new WebService();
-
-            IWampRealmProxy realm = channel.RealmProxy;
-
-            IAsyncDisposable disposable = await realm.Services.RegisterCallee(instance).ConfigureAwait(false);
+                IDisposable disposable =
+                    timer.Subscribe(x =>
+                    {
+                        counter++;
+                        try
+                        {
+                            subject.OnNext(counter);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    });                
+            }
+            catch (Exception e)
+            {
+                String test = "";
+            }
         }
 
-    
+
         private void CloseButton_Click(object sender, EventArgs e)
         {
             Application.Exit();

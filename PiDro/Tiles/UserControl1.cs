@@ -15,7 +15,7 @@ namespace Pidro.Tiles
         public UserControl1()
         {
             InitializeComponent();
-
+            
             try
             {
                 comboBox1.DataSource = Pi.Gpio.Pins;

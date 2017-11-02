@@ -15,6 +15,8 @@ namespace Pidro.Tiles
         public TileBase()
         {
             InitializeComponent();
+            this.BackColor = ComponentBase.colorPallet4;
+            label1.ForeColor = ComponentBase.colorPallet3;
         }
     }
 }
