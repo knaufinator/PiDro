@@ -93,7 +93,6 @@
             this.button4.TabIndex = 12;
             this.button4.Text = "Auto";
             this.button4.UseVisualStyleBackColor = false;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // label2
             // 
@@ -132,8 +131,8 @@
         public System.Windows.Forms.Button button3;
         public System.Windows.Forms.Button button2;
         public System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label2;
         public System.Windows.Forms.Button button4;
         public System.Windows.Forms.Label phValue;
+        public System.Windows.Forms.Label label2;
     }
 }

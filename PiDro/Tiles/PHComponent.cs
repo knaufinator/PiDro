@@ -8,6 +8,7 @@ using Unosquare.RaspberryIO.Gpio;
 using Pidro.Tools;
 using System.Reactive.Linq;
 using System.Windows.Threading;
+using System.Reactive.Subjects;
 
 namespace Pidro.Tiles
 {
@@ -15,6 +16,8 @@ namespace Pidro.Tiles
     {
         PHControlTile phTile = new PHControlTile();
         int sensorId = 0;
+
+        IDisposable subscription;
 
         ADConverter aDConverter;
         AppSettings settings = AppSettings.Instance;
@@ -26,6 +29,9 @@ namespace Pidro.Tiles
 
         double ph4;
         double ph7;
+
+        double targetPH = 5.7;
+        double phTolerance = .2;
 
         String phNode = "PH";
         String ph7Setting = "PH7";
@@ -61,31 +67,52 @@ namespace Pidro.Tiles
         }
 
         private void Auto_Click(object sender, EventArgs e)
-        {
-
-            //have target in config later
-            //5.7 for now
-
-
-            if (autoOn)
+        {        
+            if (autoOn == false)
             {
+                phTile.label2.Text = "ON";
                 autoOn = true;
-                //sample every 10 min, 
+                //sample every 30 min, if over tartget, apply correct dose up/down, once 
 
+                subscription = Observable
+                   .Interval(TimeSpan.FromSeconds(6))
+                   .ObserveOn(Dispatcher.CurrentDispatcher)
+                   .Subscribe(
+                       x =>
+                       {
+                           try
+                           {
+                               CheckPHAndDose();
+                           }
+                           catch (Exception)
+                           {
+                           }
+                       });
             }
             else
             {
+                phTile.label2.Text = "OFF";
+                autoOn = false;
 
+                if (subscription != null)
+                    subscription.Dispose();
             }
-            //turn on, sample every min, 
+        }
 
-
-            
-
-            //if ph is .2 higher than target, apply small dose every 10 min.
-
-
-            
+        BehaviorSubject<bool> switches = new BehaviorSubject<bool>(false);
+        
+        private void CheckPHAndDose()
+        {
+            Double ph = GetPH();
+            if (ph > targetPH + phTolerance)
+            {
+                //dose ph down,
+                PHDownDose(pumpAutoOnTimeSeconds);
+            }
+            else if (ph < targetPH - phTolerance)
+            {
+                PHUpDose(pumpAutoOnTimeSeconds);
+            }
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -104,7 +131,7 @@ namespace Pidro.Tiles
             calibratePHAuto();
         }
 
-        public Double getPH()
+        public Double GetPH()
         {
             double result = 0.0;
 
@@ -149,12 +176,22 @@ namespace Pidro.Tiles
 
         private void Up_Click(object sender, EventArgs e)
         {
-            RunPump(Pi.Gpio.Pin25, pumpOnTimeSeconds);
+            PHUpDose(pumpOnTimeSeconds);
         }
-
+        
         private void Down_Click(object sender, EventArgs e)
         {
-            RunPump(Pi.Gpio.Pin23, pumpOnTimeSeconds);
+            PHDownDose(pumpOnTimeSeconds);
+        }
+
+        private void PHDownDose(int seconds)
+        {
+            RunPump(Pi.Gpio.Pin23, seconds);
+        }
+
+        private void PHUpDose(int seconds)
+        {
+            RunPump(Pi.Gpio.Pin25, seconds);
         }
 
         private void RunPump(GpioPin pin, int onTime)
@@ -172,7 +209,7 @@ namespace Pidro.Tiles
         
         private void Update()
         {
-            phTile.phValue.Text = getPH().ToString("N1");
+            phTile.phValue.Text = GetPH().ToString("N1");
         }
     
         public System.Windows.Forms.Control GetTile()
