@@ -29,9 +29,9 @@ namespace Pidro
         {
             InitializeComponent();
 
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.WindowState = FormWindowState.Maximized;
-
+              this.FormBorderStyle = FormBorderStyle.None;
+            //  this.WindowState = FormWindowState.Maximized;
+            Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
             SetupWamp();//testing 
 

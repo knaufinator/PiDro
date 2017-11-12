@@ -42,7 +42,7 @@
             // 
             // label1
             // 
-            this.label1.Text = "Pin Tester";
+            this.titleLabel.Text = "Pin Tester";
             // 
             // comboBox1
             // 

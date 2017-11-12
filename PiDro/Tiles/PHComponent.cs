@@ -6,20 +6,24 @@ using System.Xml;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 using Pidro.Tools;
+using System.Reactive.Linq;
+using System.Windows.Threading;
 
 namespace Pidro.Tiles
 {
     public class PHComponent : ComponentInterface
     {
-        PHTile phTile = new PHTile();
-
-        Timer updateTimer;
+        PHControlTile phTile = new PHControlTile();
         int sensorId = 0;
 
         ADConverter aDConverter;
-        Timer phUp = new Timer();
-        Timer phDown = new Timer();
         AppSettings settings = AppSettings.Instance;
+
+        Boolean autoOn = false;
+
+        int pumpOnTimeSeconds = 2;
+        int pumpAutoOnTimeSeconds = 1;
+
         double ph4;
         double ph7;
 
@@ -32,21 +36,56 @@ namespace Pidro.Tiles
             LoadSettings();
             this.aDConverter = aDConverter;
 
-            phTile.button1.Click += Button1_Click;
+            phTile.button1.Click += Cal_Click;
             phTile.button2.Click += Up_Click;
-            phTile.button2.Click += Down_Click;
+            phTile.button3.Click += Down_Click;
+            phTile.button4.Click += Auto_Click;
 
-            phUp.Interval = 2000;
-            phUp.Tick += PH_pump_up;
+            try
+            {
+                Pi.Gpio.Pin25.PinMode = GpioPinDriveMode.Output;//ph up
+                Pi.Gpio.Pin23.PinMode = GpioPinDriveMode.Output;//ph down
+            }
+            catch
+            {
+            }
 
-            phDown.Interval = 2000;
-            phDown.Tick += PH_pump_down;
+            Observable
+            .Interval(TimeSpan.FromSeconds(1))
+            .ObserveOn(Dispatcher.CurrentDispatcher)
+            .Subscribe(
+                x =>
+                {
+                    Update();
+                });
+        }
 
-            //update the clock readout one a sec
-            updateTimer = new Timer();
-            updateTimer.Interval = 1000;
-            updateTimer.Tick += UpdateTimer_Tick;
-            updateTimer.Start();
+        private void Auto_Click(object sender, EventArgs e)
+        {
+
+            //have target in config later
+            //5.7 for now
+
+
+            if (autoOn)
+            {
+                autoOn = true;
+                //sample every 10 min, 
+
+            }
+            else
+            {
+
+            }
+            //turn on, sample every min, 
+
+
+            
+
+            //if ph is .2 higher than target, apply small dose every 10 min.
+
+
+            
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -64,8 +103,6 @@ namespace Pidro.Tiles
         {
             calibratePHAuto();
         }
-
-        //this slope function should be consolodated somewhere..
 
         public Double getPH()
         {
@@ -99,60 +136,43 @@ namespace Pidro.Tiles
             }
         }
 
-        private void Down_Click(object sender, EventArgs e)
+        private void TryPinWrite(GpioPin pin, bool level)
         {
             try
             {
-               // Pi.Gpio.Pin13.Write(true);
+                pin.Write(level);
             }
             catch (Exception)
             {
             }
-
-            phDown.Start();
         }
-        
+
         private void Up_Click(object sender, EventArgs e)
         {
-            try
-            {
-              //  Pi.Gpio.Pin26.Write(true);
-            }
-            catch (Exception)
-            {
-            }
-
-            phUp.Start();
+            RunPump(Pi.Gpio.Pin25, pumpOnTimeSeconds);
         }
 
-        private void PH_pump_up(object sender, EventArgs e)
+        private void Down_Click(object sender, EventArgs e)
         {
-            //turn off pump
-            try
-            {
-               // Pi.Gpio.Pin26.Write(false);
-            }
-            catch (Exception)
-            {
-            }
+            RunPump(Pi.Gpio.Pin23, pumpOnTimeSeconds);
         }
 
-        private void PH_pump_down(object sender, EventArgs e)
+        private void RunPump(GpioPin pin, int onTime)
         {
-            //turn off pump
-            try
-            {
-               // Pi.Gpio.Pin13.Write(false);
-            }
-            catch (Exception)
-            {
-            }
+            TryPinWrite(pin, true);
 
+            Observable
+              .Timer(TimeSpan.FromSeconds(onTime))
+              .Subscribe(
+                  x =>
+                  {
+                      TryPinWrite(pin, false);
+                  });
         }
-
-        private void UpdateTimer_Tick(object sender, EventArgs e)
+        
+        private void Update()
         {
-            phTile.set(getPH().ToString("N1"));
+            phTile.phValue.Text = getPH().ToString("N1");
         }
     
         public System.Windows.Forms.Control GetTile()

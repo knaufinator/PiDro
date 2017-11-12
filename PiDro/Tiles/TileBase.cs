@@ -16,7 +16,7 @@ namespace Pidro.Tiles
         {
             InitializeComponent();
             this.BackColor = ComponentBase.colorPallet4;
-            label1.ForeColor = ComponentBase.colorPallet3;
+            titleLabel.ForeColor = ComponentBase.colorPallet3;
         }
     }
 }

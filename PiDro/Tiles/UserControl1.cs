@@ -19,6 +19,7 @@ namespace Pidro.Tiles
             try
             {
                 comboBox1.DataSource = Pi.Gpio.Pins;
+                comboBox1.DisplayMember = "HeaderPinNumber";
             }
             catch (Exception e)
             {
@@ -32,7 +33,7 @@ namespace Pidro.Tiles
             {
                 GpioPin pin = (GpioPin)comboBox1.SelectedItem;
                 pin.PinMode = GpioPinDriveMode.Output;
-                pin.WriteLevel(1);
+                pin.Write(true);
             }
             catch (Exception erf)
             {
@@ -47,11 +48,11 @@ namespace Pidro.Tiles
             {
                 GpioPin pin = (GpioPin)comboBox1.SelectedItem;
                 pin.PinMode = GpioPinDriveMode.Output;
-                pin.WriteLevel(0);
+                pin.Write(false);
             }
             catch (Exception re)
             {
-             
+                MessageBox.Show(re.Message);
             }
         }
     }

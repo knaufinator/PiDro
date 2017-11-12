@@ -322,7 +322,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Unosquare.RaspberryIO, Version=0.12.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -358,6 +360,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tiles\PHControlTile.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Tiles\PHControlTile.Designer.cs">
+      <DependentUpon>PHControlTile.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tiles\TileBase.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -416,12 +424,6 @@
     <Compile Include="Tiles\PressureComponent.cs" />
     <Compile Include="Tiles\PHComponent.cs" />
     <Compile Include="Tiles\TimerComponent.cs" />
-    <Compile Include="Tiles\PHTile.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Tiles\PHTile.Designer.cs">
-      <DependentUpon>PHTile.cs</DependentUpon>
-    </Compile>
     <Compile Include="Tiles\TimerRelayTile.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -443,6 +445,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -454,14 +457,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Tiles\PHControlTile.resx">
+      <DependentUpon>PHControlTile.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Tiles\TemperatureTile.resx">
       <DependentUpon>TemperatureTile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tiles\PressureTile.resx">
       <DependentUpon>PressureTile.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Tiles\PHTile.resx">
-      <DependentUpon>PHTile.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Tiles\TileBase.resx">
       <DependentUpon>TileBase.cs</DependentUpon>
