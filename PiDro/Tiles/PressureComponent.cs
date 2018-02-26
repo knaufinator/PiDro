@@ -25,8 +25,7 @@ namespace Pidro.Tiles
         String pressure80Setting = "Pressure80";
 
         public PressureComponent(ADConverter aDConverter)
-        {
-            
+        {  
             LoadSettings();
             this.aDConverter = aDConverter;
             pressureTile.button1.Click += Button1_Click;

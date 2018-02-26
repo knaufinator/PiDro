@@ -1,39 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
 
-namespace Pidro.Tiles
+namespace Pidro.Dialogs
 {
-    public partial class UserControl1 : Pidro.Tiles.TileBase
+    public partial class PinTester : Form
     {
-        public UserControl1()
+        public PinTester()
         {
             InitializeComponent();
-            
-            try
-            {
-                comboBox1.DataSource = Pi.Gpio.Pins;
-                comboBox1.DisplayMember = "HeaderPinNumber";
-            }
-            catch (Exception e)
-            {
-            }
+            comboBox1.DataSource = Pi.Gpio.Pins;
+            comboBox1.DisplayMember = "HeaderPinNumber";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            //get selected pin
             try
             {
                 GpioPin pin = (GpioPin)comboBox1.SelectedItem;
                 pin.PinMode = GpioPinDriveMode.Output;
                 pin.Write(true);
+                
             }
             catch (Exception erf)
             {
@@ -43,16 +31,15 @@ namespace Pidro.Tiles
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //get selected pin
             try
             {
                 GpioPin pin = (GpioPin)comboBox1.SelectedItem;
                 pin.PinMode = GpioPinDriveMode.Output;
                 pin.Write(false);
             }
-            catch (Exception re)
+            catch (Exception erf)
             {
-                MessageBox.Show(re.Message);
+                MessageBox.Show(erf.Message);
             }
         }
     }

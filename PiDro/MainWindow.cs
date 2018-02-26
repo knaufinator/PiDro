@@ -43,15 +43,12 @@ namespace Pidro
             PHComponent pHComponent = new PHComponent(aDConverter);
             PressureComponent pressureComponent = new PressureComponent(aDConverter);
             TemperatureComponent temperatureComponent = new TemperatureComponent();
-
-            //pin tester, in order to hunt down what pins have relays attached
-            UserControl1 test = new UserControl1();
             
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(test);
+     
         }
 
         private void SetupWamp()
@@ -81,7 +78,7 @@ namespace Pidro
                         catch (Exception ex)
                         {
                         }
-                    });                
+                    });
             }
             catch (Exception e)
             {
@@ -151,6 +148,12 @@ namespace Pidro
         {
             ArcTest arcTest = new ArcTest();
             arcTest.Show();
+        }
+
+        private void pinTestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PinTester tester = new PinTester();
+            tester.Show();
         }
     }    
 }

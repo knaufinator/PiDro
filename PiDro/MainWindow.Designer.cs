@@ -34,6 +34,7 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arcTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.pinTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -55,7 +56,8 @@
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.closeToolStripMenuItem,
             this.settingsToolStripMenuItem,
-            this.arcTestToolStripMenuItem});
+            this.arcTestToolStripMenuItem,
+            this.pinTestToolStripMenuItem});
             this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 36);
@@ -90,6 +92,13 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(800, 440);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
+            // pinTestToolStripMenuItem
+            // 
+            this.pinTestToolStripMenuItem.Name = "pinTestToolStripMenuItem";
+            this.pinTestToolStripMenuItem.Size = new System.Drawing.Size(176, 36);
+            this.pinTestToolStripMenuItem.Text = "Pin Test";
+            this.pinTestToolStripMenuItem.Click += new System.EventHandler(this.pinTestToolStripMenuItem_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -117,6 +126,7 @@
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem arcTestToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pinTestToolStripMenuItem;
     }
 }
 

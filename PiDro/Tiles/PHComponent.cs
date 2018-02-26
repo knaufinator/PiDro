@@ -9,13 +9,15 @@ using Pidro.Tools;
 using System.Reactive.Linq;
 using System.Windows.Threading;
 using System.Reactive.Subjects;
+using System.Text;
 
 namespace Pidro.Tiles
 {
     public class PHComponent : ComponentInterface
     {
-        PHControlTile phTile = new PHControlTile();
+        PHTile phTile = new PHTile();
         int sensorId = 0;
+        I2CDevice ezoDevice;
 
         IDisposable subscription;
 
@@ -36,41 +38,61 @@ namespace Pidro.Tiles
         String phNode = "PH";
         String ph7Setting = "PH7";
         String ph4Setting = "PH4";
-
-        public PHComponent(ADConverter aDConverter)
+        
+        public PHComponent()
         {
             LoadSettings();
-            this.aDConverter = aDConverter;
-
-            phTile.button1.Click += Cal_Click;
-            phTile.button2.Click += Up_Click;
-            phTile.button3.Click += Down_Click;
-            phTile.button4.Click += Auto_Click;
 
             try
             {
-                Pi.Gpio.Pin25.PinMode = GpioPinDriveMode.Output;//ph up
-                Pi.Gpio.Pin23.PinMode = GpioPinDriveMode.Output;//ph down
+               // Pi.Gpio.Pins[]
+
+              //Pi.Gpio.Pin25.PinMode = GpioPinDriveMode.Output;//ph up
+              //Pi.Gpio.Pin23.PinMode = GpioPinDriveMode.Output;//ph down
             }
             catch
             {
             }
 
+            //   phTile.button1.Click += Cal_Click;
+            //  phTile.button2.Click += Up_Click;
+            // phTile.button3.Click += Down_Click;
+            //phTile.button4.Click += Auto_Click;
+
             Observable
-            .Interval(TimeSpan.FromSeconds(1))
-            .ObserveOn(Dispatcher.CurrentDispatcher)
-            .Subscribe(
-                x =>
-                {
-                    Update();
-                });
+           .Interval(TimeSpan.FromSeconds(1))
+           .ObserveOn(Dispatcher.CurrentDispatcher)
+           .Subscribe(
+               x =>
+               {
+                   Update();
+               });
+        }
+
+        public PHComponent(ADConverter aDConverter) : base()
+        {
+            this.aDConverter = aDConverter;
+            
+           
+        }
+
+        public PHComponent(int deviceID) : base()
+        {        
+            try
+            {
+                ezoDevice = Pi.I2C.AddDevice(deviceID);
+
+            }
+            catch
+            {
+            }
         }
 
         private void Auto_Click(object sender, EventArgs e)
         {        
             if (autoOn == false)
             {
-                phTile.label2.Text = "ON";
+              //  phTile.label2.Text = "ON";
                 autoOn = true;
                 //sample every 30 min, if over tartget, apply correct dose up/down, once 
 
@@ -91,7 +113,7 @@ namespace Pidro.Tiles
             }
             else
             {
-                phTile.label2.Text = "OFF";
+               // phTile.label2.Text = "OFF";
                 autoOn = false;
 
                 if (subscription != null)
@@ -209,12 +231,23 @@ namespace Pidro.Tiles
         
         private void Update()
         {
-            phTile.phValue.Text = GetPH().ToString("N1");
+            //phTile.phValue.Text = GetPH().ToString("N1");
+            ezoDevice.Write(Encoding.ASCII.GetBytes("r"));
+            
+            Observable
+            .Timer(TimeSpan.FromMilliseconds(900))
+            .Subscribe(
+            x =>
+            {
+                //wait some time, then read
+                byte d = ezoDevice.Read();
+                phTile.set(d.ToString());
+            });
         }
     
         public System.Windows.Forms.Control GetTile()
         {
-            return phTile;
+            return null;
         }
     }    
 }
