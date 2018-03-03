@@ -8,8 +8,11 @@ using Unosquare.RaspberryIO.Gpio;
 using Pidro.Tools;
 using System.Reactive.Linq;
 using System.Windows.Threading;
-using System.Reactive.Subjects;
 using System.Text;
+using System.Collections.Generic;
+using System.Reactive.Subjects;
+using RaspberrySharp.IO.InterIntegratedCircuit;
+using RaspberrySharp.IO.GeneralPurpose;
 
 namespace Pidro.Tiles
 {
@@ -17,7 +20,7 @@ namespace Pidro.Tiles
     {
         PHTile phTile = new PHTile();
         int sensorId = 0;
-        I2CDevice ezoDevice;
+       // I2CDevice ezoDevice;
 
         IDisposable subscription;
 
@@ -29,11 +32,15 @@ namespace Pidro.Tiles
         int pumpOnTimeSeconds = 2;
         int pumpAutoOnTimeSeconds = 1;
 
+        private static I2cDriver driver;
+        private static I2cDeviceConnection i2cConnection;
+
         double ph4;
         double ph7;
 
         double targetPH = 5.7;
         double phTolerance = .2;
+        double PH = 0;
 
         String phNode = "PH";
         String ph7Setting = "PH7";
@@ -42,6 +49,7 @@ namespace Pidro.Tiles
         public PHComponent()
         {
             LoadSettings();
+          
 
             try
             {
@@ -59,33 +67,41 @@ namespace Pidro.Tiles
             // phTile.button3.Click += Down_Click;
             //phTile.button4.Click += Auto_Click;
 
-            Observable
-           .Interval(TimeSpan.FromSeconds(1))
-           .ObserveOn(Dispatcher.CurrentDispatcher)
-           .Subscribe(
-               x =>
-               {
-                   Update();
-               });
+            IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(2000));
+
+            IDisposable disposable =
+                timer.Subscribe(x =>
+                {
+                    
+                    try
+                    {
+                        Update();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                });
+
+
         }
 
-        public PHComponent(ADConverter aDConverter) : base()
+        public PHComponent(ADConverter aDConverter) : this()
         {
             this.aDConverter = aDConverter;
-            
-           
         }
 
-        public PHComponent(int deviceID) : base()
+        public PHComponent(int deviceID) : this()
         {        
             try
             {
-                ezoDevice = Pi.I2C.AddDevice(deviceID);
-
+                //ezoDevice = Pi.I2C.AddDevice(deviceID);
+                driver = new I2cDriver(ProcessorPin.Gpio02, ProcessorPin.Gpio03);
+                i2cConnection = driver.Connect(0x63);
             }
             catch
             {
             }
+            
         }
 
         private void Auto_Click(object sender, EventArgs e)
@@ -122,9 +138,9 @@ namespace Pidro.Tiles
         }
 
         BehaviorSubject<bool> switches = new BehaviorSubject<bool>(false);
-        
+         // as
         private void CheckPHAndDose()
-        {
+        { 
             Double ph = GetPH();
             if (ph > targetPH + phTolerance)
             {
@@ -231,23 +247,48 @@ namespace Pidro.Tiles
         
         private void Update()
         {
-            //phTile.phValue.Text = GetPH().ToString("N1");
-            ezoDevice.Write(Encoding.ASCII.GetBytes("r"));
-            
-            Observable
-            .Timer(TimeSpan.FromMilliseconds(900))
-            .Subscribe(
-            x =>
+            try
             {
-                //wait some time, then read
-                byte d = ezoDevice.Read();
-                phTile.set(d.ToString());
-            });
+                i2cConnection.Write(Encoding.ASCII.GetBytes("R"));
+
+                Observable
+                .Timer(TimeSpan.FromMilliseconds(1000))
+                .Subscribe(
+                x =>
+                {
+                    try
+                    {
+                        byte[] result = i2cConnection.Read(20);
+
+                        if (result[0] == 1)
+                        {
+                            String strPH = Encoding.ASCII.GetString(result).Substring(1);
+                            Double.TryParse(strPH, out PH);
+                            phTile.Set(strPH);
+                        }
+                        else
+                        {
+                            phTile.Set("ERR");
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    //int[] bytesAsInts = Array.ConvertAll(result, c => (int)c);
+                    //phTile.Set(string.Join(" ", bytesAsInts));
+
+                });
+            }
+            catch (Exception err)
+            {
+                //phTile.Set(err.Message);
+            }
         }
     
         public System.Windows.Forms.Control GetTile()
         {
-            return null;
+            return phTile;
         }
     }    
 }

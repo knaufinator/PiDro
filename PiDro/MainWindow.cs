@@ -4,15 +4,7 @@ using Mono.Nat;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using Pidro.Tools;
-using System.Threading.Tasks;
-using WampSharp.V2;
-using Pidro.Service;
-using WampSharp.V2.Client;
-using SystemEx;
-using WampSharp.V2.Realm;
-using System.Reactive.Subjects;
-using System.Reactive.Linq;
+
 
 namespace Pidro
 {
@@ -33,58 +25,60 @@ namespace Pidro
             //  this.WindowState = FormWindowState.Maximized;
             Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
-            SetupWamp();//testing 
+            //SetupWamp();//testing 
 
 
-            ADConverter aDConverter = new ADConverter(0x48);
+           // ADConverter aDConverter = new ADConverter(0x48);
             
             //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
-            PHComponent pHComponent = new PHComponent(aDConverter);
-            PressureComponent pressureComponent = new PressureComponent(aDConverter);
+            PHComponent pHComponent = new PHComponent(99);
+
+
+           // PressureComponent pressureComponent = new PressureComponent(aDConverter);
             TemperatureComponent temperatureComponent = new TemperatureComponent();
             
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
+           // this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
+           // this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
      
         }
 
-        private void SetupWamp()
-        {          
-            try
-            {
-                string location = "ws://" + NetworkTool.GetLocalIPAddress() +":8080/ws";
-                DefaultWampHost host = new DefaultWampHost(location);
-                host.Open();
+        //private void SetupWamp()
+        //{          
+        //    try
+        //    {
+        //        string location = "ws://" + NetworkTool.GetLocalIPAddress() +":8080/ws";
+        //        DefaultWampHost host = new DefaultWampHost(location);
+        //        host.Open();
                 
-                IWampHostedRealm realm = host.RealmContainer.GetRealmByName("data");
+        //        IWampHostedRealm realm = host.RealmContainer.GetRealmByName("data");
 
-                ISubject<int> subject =
-                    realm.Services.GetSubject<int>("com.pidra.data");
+        //        ISubject<int> subject =
+        //            realm.Services.GetSubject<int>("com.pidra.data");
 
-                int counter = 0;
-                IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0),TimeSpan.FromMilliseconds(1000));
+        //        int counter = 0;
+        //        IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0),TimeSpan.FromMilliseconds(1000));
 
-                IDisposable disposable =
-                    timer.Subscribe(x =>
-                    {
-                        counter++;
-                        try
-                        {
-                            subject.OnNext(counter);
-                        }
-                        catch (Exception ex)
-                        {
-                        }
-                    });
-            }
-            catch (Exception e)
-            {
-                String test = "";
-            }
-        }
+        //        IDisposable disposable =
+        //            timer.Subscribe(x =>
+        //            {
+        //                counter++;
+        //                try
+        //                {
+        //                    subject.OnNext(counter);
+        //                }
+        //                catch (Exception ex)
+        //                {
+        //                }
+        //            });
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        String test = "";
+        //    }
+        //}
 
 
         private void CloseButton_Click(object sender, EventArgs e)

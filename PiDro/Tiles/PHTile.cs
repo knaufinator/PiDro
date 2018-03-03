@@ -23,18 +23,16 @@ namespace Pidro.Tiles
             label1.ForeColor = ComponentBase.colorPallet3;
         }
 
-        public void set(String ph)
+        public void Set(string value)
         {
-            if (textBox1.InvokeRequired)
+            if (InvokeRequired)
             {
-                textBox1.Invoke((MethodInvoker)delegate { textBox1.Text = ph; });
+                this.Invoke(new Action<string>(Set), new object[] { value });
+                return;
             }
-            else
-            {
-                textBox1.Text = ph;
-            }
+            textBox1.Text = value;
         }
-
+        
         private void button1_Click(object sender, EventArgs e)
         {
 
