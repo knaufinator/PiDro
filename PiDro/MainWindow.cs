@@ -21,7 +21,7 @@ namespace Pidro
         {
             InitializeComponent();
 
-              this.FormBorderStyle = FormBorderStyle.None;
+             // this.FormBorderStyle = FormBorderStyle.None;
             //  this.WindowState = FormWindowState.Maximized;
             Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
@@ -32,11 +32,11 @@ namespace Pidro
             
             //create dynamic builder, from config xml, generate each component
             TimerComponent timerComponent = new TimerComponent(300, 5);
-            PHComponent pHComponent = new PHComponent(99);
+            PHComponent pHComponent = new PHComponent(99,29,31);
 
 
            // PressureComponent pressureComponent = new PressureComponent(aDConverter);
-            TemperatureComponent temperatureComponent = new TemperatureComponent();
+           // TemperatureComponent temperatureComponent = new TemperatureComponent();
             
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());

@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using System.Text;
 using System.Collections.Generic;
 using System.Reactive.Subjects;
+using System.Linq;
 using RaspberrySharp.IO.InterIntegratedCircuit;
 using RaspberrySharp.IO.GeneralPurpose;
 
@@ -20,7 +21,10 @@ namespace Pidro.Tiles
     {
         PHTile phTile = new PHTile();
         int sensorId = 0;
-       // I2CDevice ezoDevice;
+
+        int phdownHeaderPinNumber = 0;
+        int phupHeaderPinNumber = 0;
+
 
         IDisposable subscription;
 
@@ -29,43 +33,27 @@ namespace Pidro.Tiles
 
         Boolean autoOn = false;
 
-        int pumpOnTimeSeconds = 2;
-        int pumpAutoOnTimeSeconds = 1;
+        int pumpOnTimeSeconds = 4;
+        int pumpAutoOnTimeSeconds = 3;
 
         private static I2cDriver driver;
         private static I2cDeviceConnection i2cConnection;
-
-        double ph4;
-        double ph7;
 
         double targetPH = 5.7;
         double phTolerance = .2;
         double PH = 0;
 
         String phNode = "PH";
-        String ph7Setting = "PH7";
-        String ph4Setting = "PH4";
+   
         
         public PHComponent()
         {
             LoadSettings();
           
-
-            try
-            {
-               // Pi.Gpio.Pins[]
-
-              //Pi.Gpio.Pin25.PinMode = GpioPinDriveMode.Output;//ph up
-              //Pi.Gpio.Pin23.PinMode = GpioPinDriveMode.Output;//ph down
-            }
-            catch
-            {
-            }
-
-            //   phTile.button1.Click += Cal_Click;
-            //  phTile.button2.Click += Up_Click;
-            // phTile.button3.Click += Down_Click;
-            //phTile.button4.Click += Auto_Click;
+            //phTile.button1.Click += Cal_Click;
+            phTile.button2.Click += Auto_Click;
+            phTile.button3.Click += Up_Click;
+            phTile.button4.Click += Down_Click;
 
             IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(2000));
 
@@ -81,40 +69,41 @@ namespace Pidro.Tiles
                     {
                     }
                 });
-
-
         }
 
-        public PHComponent(ADConverter aDConverter) : this()
+        public PHComponent(int deviceID,int upHeaderPin, int downHeaderPin) : this()
         {
-            this.aDConverter = aDConverter;
-        }
+            phdownHeaderPinNumber = downHeaderPin;
+            phupHeaderPinNumber = upHeaderPin;
 
-        public PHComponent(int deviceID) : this()
-        {        
+            GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == upHeaderPin);
+            if (p1 != null)
+                p1.PinMode = GpioPinDriveMode.Output;
+
+            GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == downHeaderPin);
+            if (p2 != null)
+                p2.PinMode = GpioPinDriveMode.Output;
+
             try
             {
-                //ezoDevice = Pi.I2C.AddDevice(deviceID);
                 driver = new I2cDriver(ProcessorPin.Gpio02, ProcessorPin.Gpio03);
                 i2cConnection = driver.Connect(0x63);
             }
             catch
             {
             }
-            
         }
 
         private void Auto_Click(object sender, EventArgs e)
         {        
             if (autoOn == false)
             {
-              //  phTile.label2.Text = "ON";
+                phTile.button2.Text = "On";
                 autoOn = true;
+               
                 //sample every 30 min, if over tartget, apply correct dose up/down, once 
-
                 subscription = Observable
-                   .Interval(TimeSpan.FromSeconds(6))
-                   .ObserveOn(Dispatcher.CurrentDispatcher)
+                   .Interval(TimeSpan.FromSeconds(30))
                    .Subscribe(
                        x =>
                        {
@@ -129,7 +118,7 @@ namespace Pidro.Tiles
             }
             else
             {
-               // phTile.label2.Text = "OFF";
+                phTile.button2.Text = "OFF";
                 autoOn = false;
 
                 if (subscription != null)
@@ -138,68 +127,32 @@ namespace Pidro.Tiles
         }
 
         BehaviorSubject<bool> switches = new BehaviorSubject<bool>(false);
-         // as
+         
         private void CheckPHAndDose()
-        { 
-            Double ph = GetPH();
-            if (ph > targetPH + phTolerance)
+        {      
+            //error state, bad data dont act on it.
+            if (PH == 0)
+                return;
+
+            if (PH > targetPH + phTolerance)
             {
                 //dose ph down,
                 PHDownDose(pumpAutoOnTimeSeconds);
             }
-            else if (ph < targetPH - phTolerance)
+            else if (PH < targetPH - phTolerance)
             {
                 PHUpDose(pumpAutoOnTimeSeconds);
             }
         }
 
-        private void Button1_Click(object sender, EventArgs e)
-        {
-            calibratePHAuto();
-        }
 
         private void LoadSettings()
         {
-            Double.TryParse(settings.GetSetting(phNode, ph4Setting, "1.0"), out ph4);
-            Double.TryParse(settings.GetSetting(phNode, ph7Setting, "2.0"), out ph7);
+            //Double.TryParse(settings.GetSetting(phNode, ph4Setting, "1.0"), out ph4);
+           // Double.TryParse(settings.GetSetting(phNode, ph7Setting, "2.0"), out ph7);
         }
         
-        private void Cal_Click(object sender, EventArgs e)
-        {
-            calibratePHAuto();
-        }
-
-        public Double GetPH()
-        {
-            double result = 0.0;
-
-            if (ph4 > 0 & ph7 > 0)
-            {
-                double[] x = { ph4, ph7 };
-                double[] y = { 4, 7 };
-
-                result = ADConverter.Interpolate(x, y, aDConverter.GetADVoltage(sensorId));
-            }
-          
-            return result;
-        }
-
-        public void calibratePHAuto()
-        {
-            Double phV = aDConverter.GetADVoltage(sensorId);
-            Double vCutoff = 1.5;
-
-            if (phV >= vCutoff)
-            {
-                ph7 = phV;
-                settings.SaveSetting(phNode, ph7Setting, phV.ToString());
-            }
-            else
-            {
-                ph4 = phV;
-                settings.SaveSetting(phNode, ph4Setting, phV.ToString());
-            }
-        }
+  
 
         private void TryPinWrite(GpioPin pin, bool level)
         {
@@ -224,16 +177,19 @@ namespace Pidro.Tiles
 
         private void PHDownDose(int seconds)
         {
-            RunPump(Pi.Gpio.Pin23, seconds);
+            RunPump(Pi.Gpio.Pins.FirstOrDefault(i=>i.HeaderPinNumber == phdownHeaderPinNumber), seconds);
         }
 
         private void PHUpDose(int seconds)
         {
-            RunPump(Pi.Gpio.Pin25, seconds);
+            RunPump(Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber), seconds);
         }
 
         private void RunPump(GpioPin pin, int onTime)
         {
+            if (pin == null)
+                return;
+
             TryPinWrite(pin, true);
 
             Observable
@@ -252,7 +208,7 @@ namespace Pidro.Tiles
                 i2cConnection.Write(Encoding.ASCII.GetBytes("R"));
 
                 Observable
-                .Timer(TimeSpan.FromMilliseconds(1000))
+                .Timer(TimeSpan.FromMilliseconds(900))
                 .Subscribe(
                 x =>
                 {
@@ -264,7 +220,7 @@ namespace Pidro.Tiles
                         {
                             String strPH = Encoding.ASCII.GetString(result).Substring(1);
                             Double.TryParse(strPH, out PH);
-                            phTile.Set(strPH);
+                            phTile.Set(String.Format("{0:F1}", PH));
                         }
                         else
                         {
@@ -274,15 +230,10 @@ namespace Pidro.Tiles
                     catch (Exception)
                     {
                     }
-
-                    //int[] bytesAsInts = Array.ConvertAll(result, c => (int)c);
-                    //phTile.Set(string.Join(" ", bytesAsInts));
-
                 });
             }
             catch (Exception err)
             {
-                //phTile.Set(err.Message);
             }
         }
     

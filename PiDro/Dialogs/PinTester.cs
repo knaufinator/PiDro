@@ -21,7 +21,6 @@ namespace Pidro.Dialogs
                 GpioPin pin = (GpioPin)comboBox1.SelectedItem;
                 pin.PinMode = GpioPinDriveMode.Output;
                 pin.Write(true);
-                
             }
             catch (Exception erf)
             {
