@@ -16,9 +16,16 @@ namespace Pidro.Tiles
     {
         TemperatureTile temperatureTile = new TemperatureTile();
         Timer updateTimer;
+        String address;// = "28-01161b0ab2ee";
+        String name;
 
-        public TemperatureComponent( )
+        public TemperatureComponent(String Name,String W1Address)
         {
+            address = W1Address;
+            name = Name;
+
+            temperatureTile.nameLabel.Text = Name;
+
             //update the clock readout one a sec
             updateTimer = new Timer();
             updateTimer.Interval = 1000;
@@ -37,10 +44,7 @@ namespace Pidro.Tiles
             try
             {
                 DirectoryInfo devicesDir = new DirectoryInfo("/sys/bus/w1/devices");
-
-                //address
-                String address = "28-01161b0ab2ee";
-
+                
                 foreach (var deviceDir in devicesDir.EnumerateDirectories(address))
                 {
                     var w1slavetext =

@@ -24,7 +24,7 @@ namespace Pidro.Tiles
 
         int phdownHeaderPinNumber = 0;
         int phupHeaderPinNumber = 0;
-
+        List<double> phHistory = new List<double>();
 
         IDisposable subscription;
 
@@ -33,14 +33,14 @@ namespace Pidro.Tiles
 
         Boolean autoOn = false;
 
-        int pumpOnTimeSeconds = 4;
-        int pumpAutoOnTimeSeconds = 3;
+        int pumpOnTimeMilliSeconds = 1000;
+        int pumpAutoOnTimeMilliSeconds = 500;
 
         private static I2cDriver driver;
         private static I2cDeviceConnection i2cConnection;
 
-        double targetPH = 5.7;
-        double phTolerance = .2;
+        double targetPH = 5.75;
+        double phTolerance = .1;
         double PH = 0;
 
         String phNode = "PH";
@@ -54,13 +54,12 @@ namespace Pidro.Tiles
             phTile.button2.Click += Auto_Click;
             phTile.button3.Click += Up_Click;
             phTile.button4.Click += Down_Click;
+            phTile.label2.Text = targetPH.ToString();
 
+            //update the ph value, every 2 seconds,
             IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(2000));
-
             IDisposable disposable =
-                timer.Subscribe(x =>
-                {
-                    
+                timer.Subscribe(x =>{
                     try
                     {
                         Update();
@@ -101,9 +100,9 @@ namespace Pidro.Tiles
                 phTile.button2.Text = "On";
                 autoOn = true;
                
-                //sample every 30 min, if over tartget, apply correct dose up/down, once 
+                //sample every x seconds, if over target, apply correct dose up/down, once 
                 subscription = Observable
-                   .Interval(TimeSpan.FromSeconds(30))
+                   .Interval(TimeSpan.FromSeconds(300))//5 min
                    .Subscribe(
                        x =>
                        {
@@ -129,22 +128,19 @@ namespace Pidro.Tiles
         BehaviorSubject<bool> switches = new BehaviorSubject<bool>(false);
          
         private void CheckPHAndDose()
-        {      
-            //error state, bad data dont act on it.
-            if (PH == 0)
-                return;
+        {
+            double phAvg = phHistory.Average();
 
-            if (PH > targetPH + phTolerance)
+            if (phAvg > targetPH + phTolerance)
             {
                 //dose ph down,
-                PHDownDose(pumpAutoOnTimeSeconds);
+                PHDownDose(pumpAutoOnTimeMilliSeconds);
             }
-            else if (PH < targetPH - phTolerance)
+            else if (phAvg < targetPH - phTolerance)
             {
-                PHUpDose(pumpAutoOnTimeSeconds);
+                PHUpDose(pumpAutoOnTimeMilliSeconds);
             }
         }
-
 
         private void LoadSettings()
         {
@@ -152,8 +148,6 @@ namespace Pidro.Tiles
            // Double.TryParse(settings.GetSetting(phNode, ph7Setting, "2.0"), out ph7);
         }
         
-  
-
         private void TryPinWrite(GpioPin pin, bool level)
         {
             try
@@ -167,25 +161,25 @@ namespace Pidro.Tiles
 
         private void Up_Click(object sender, EventArgs e)
         {
-            PHUpDose(pumpOnTimeSeconds);
+            PHUpDose(pumpOnTimeMilliSeconds);
         }
         
         private void Down_Click(object sender, EventArgs e)
         {
-            PHDownDose(pumpOnTimeSeconds);
+            PHDownDose(pumpOnTimeMilliSeconds);
         }
 
-        private void PHDownDose(int seconds)
+        private void PHDownDose(int milliseconds)
         {
-            RunPump(Pi.Gpio.Pins.FirstOrDefault(i=>i.HeaderPinNumber == phdownHeaderPinNumber), seconds);
+            RunPump(Pi.Gpio.Pins.FirstOrDefault(i=>i.HeaderPinNumber == phdownHeaderPinNumber), milliseconds);
         }
 
-        private void PHUpDose(int seconds)
+        private void PHUpDose(int milliseconds)
         {
-            RunPump(Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber), seconds);
+            RunPump(Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber), milliseconds);
         }
 
-        private void RunPump(GpioPin pin, int onTime)
+        private void RunPump(GpioPin pin, int onTimeMilliseconds)
         {
             if (pin == null)
                 return;
@@ -193,7 +187,7 @@ namespace Pidro.Tiles
             TryPinWrite(pin, true);
 
             Observable
-              .Timer(TimeSpan.FromSeconds(onTime))
+              .Timer(TimeSpan.FromMilliseconds(onTimeMilliseconds))
               .Subscribe(
                   x =>
                   {
@@ -207,6 +201,7 @@ namespace Pidro.Tiles
             {
                 i2cConnection.Write(Encoding.ASCII.GetBytes("R"));
 
+                //ezo needs 900 milliseconds to get a value ready
                 Observable
                 .Timer(TimeSpan.FromMilliseconds(900))
                 .Subscribe(
@@ -219,8 +214,21 @@ namespace Pidro.Tiles
                         if (result[0] == 1)
                         {
                             String strPH = Encoding.ASCII.GetString(result).Substring(1);
-                            Double.TryParse(strPH, out PH);
-                            phTile.Set(String.Format("{0:F1}", PH));
+                            Double phResult = 0;
+
+                            Double.TryParse(strPH, out phResult);
+                            phHistory.Add(phResult);
+
+                            //keep 10 in history
+                            if (phHistory.Count > 10)
+                            {
+                                phHistory.RemoveAt(0);
+                            }
+
+                            //global value for when the ui wants to update.
+                            PH = phResult;
+
+                            phTile.Set(String.Format("{0:F1}", phResult));
                         }
                         else
                         {

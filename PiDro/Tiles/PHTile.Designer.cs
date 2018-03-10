@@ -63,7 +63,6 @@
             this.button4.TabIndex = 9;
             this.button4.Text = "Down";
             this.button4.UseVisualStyleBackColor = true;
-            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // button3
             // 
@@ -73,8 +72,7 @@
             this.button3.Size = new System.Drawing.Size(83, 32);
             this.button3.TabIndex = 8;
             this.button3.Text = "Up";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
+            this.button3.UseVisualStyleBackColor = true;          
             // 
             // label2
             // 
@@ -95,7 +93,6 @@
             this.button2.TabIndex = 6;
             this.button2.Text = "OFF";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // label1
             // 
@@ -118,7 +115,6 @@
             this.button1.TabIndex = 1;
             this.button1.Text = "C";
             this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // textBox1
             // 

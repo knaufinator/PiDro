@@ -15,16 +15,16 @@ namespace Pidro
         //this will be in xml config later...
         //ports that will be opened up, internal for when we have multiple pis, and want to just use dif port mappings
         int[] externalPorts = new int[] { 8123, 5900, 22 };
-        //int[] internalPorts = new int[] { 8123, 5900, 22 };
+        int[] internalPorts = new int[] { 8123, 5900, 22 };
         
         public MainWindow()
         {
             InitializeComponent();
 
-             // this.FormBorderStyle = FormBorderStyle.None;
-            //  this.WindowState = FormWindowState.Maximized;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
             Size = new System.Drawing.Size(800, 480);
-            //setupUPNP();//uncomment to make upnp forward your ports
+           // setupUPNP();//uncomment to make upnp forward your ports
             //SetupWamp();//testing 
 
 
@@ -35,14 +35,20 @@ namespace Pidro
             PHComponent pHComponent = new PHComponent(99,29,31);
 
 
-           // PressureComponent pressureComponent = new PressureComponent(aDConverter);
-           // TemperatureComponent temperatureComponent = new TemperatureComponent();
-            
+            // PressureComponent pressureComponent = new PressureComponent(aDConverter);
+             TemperatureComponent temperatureComponent = new TemperatureComponent("Tent", "28-0517c0d60aff");
+             TemperatureComponent temperatureComponent2 = new TemperatureComponent("Reservoir", "28-0517c0d58cff");
+
+            //28-0517c0d60aff
+            //28-0517c0d58cff
+
             this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
             this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
            // this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-           // this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
-     
+            this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
+            this.flowLayoutPanel1.Controls.Add(temperatureComponent2.GetTile());
+
+
         }
 
         //private void SetupWamp()
@@ -52,7 +58,7 @@ namespace Pidro
         //        string location = "ws://" + NetworkTool.GetLocalIPAddress() +":8080/ws";
         //        DefaultWampHost host = new DefaultWampHost(location);
         //        host.Open();
-                
+
         //        IWampHostedRealm realm = host.RealmContainer.GetRealmByName("data");
 
         //        ISubject<int> subject =
@@ -109,12 +115,12 @@ namespace Pidro
 
 
                 //add the ports we want for our IP
-                foreach (int port in externalPorts)
-                {   
-                    Console.WriteLine("Creating IP: " + device.LocalAddress.ToString()+ " port: " + port.ToString());
-                    device.CreatePortMap(new Mapping(Protocol.Tcp, port, port));
+                for (int i = 0; i <= 2; i++)
+                {
+                    Console.WriteLine("Creating IP: " + device.LocalAddress.ToString()+ " port: " + i.ToString());
+                    device.CreatePortMap(new Mapping(Protocol.Tcp, internalPorts[i], externalPorts[i]));
                 }
-                    
+                
             }
             catch (Exception e)
             {
