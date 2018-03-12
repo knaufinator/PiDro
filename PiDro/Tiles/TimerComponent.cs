@@ -1,5 +1,6 @@
 ﻿using Pidro.Tiles;
 using System;
+using System.Linq;
 using System.Windows.Forms;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
@@ -8,7 +9,7 @@ namespace Pidro.Tiles
 {
     public class TimerComponent :ComponentInterface
     {
-        TimerRelayTile trPanel = new TimerRelayTile("Spray Timer");
+        TimerRelayTile trPanel;
 
         Boolean triggerOn = false;
         DateTime TriggerOnTime;
@@ -24,8 +25,14 @@ namespace Pidro.Tiles
         private int triggerDelaySec;
         private int triggerOnTimeSec;
 
-        public TimerComponent( int triggerDelaySec,int triggerOnTimeSec)
+        private int relayPort;
+        //GpioPin p1;// = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == upHeaderPin);
+
+        public TimerComponent(String Name, int triggerDelaySec,int triggerOnTimeSec, int acRelayPort)
         {
+            trPanel = new TimerRelayTile(Name);
+            relayPort = acRelayPort;
+
             this.triggerDelaySec = triggerDelaySec;
             this.triggerOnTimeSec = triggerOnTimeSec;
 
@@ -60,7 +67,7 @@ namespace Pidro.Tiles
             else
                 timeleft = triggerDelaySecSpan - (DateTime.Now - TriggerOffTime);
             
-            result = timeleft.Minutes.ToString() + "m " + timeleft.Seconds.ToString() + "s";
+            result = timeleft.Hours.ToString() + "h" + timeleft.Minutes.ToString() + "m " + timeleft.Seconds.ToString() + "s";
             trPanel.set(result, triggerOn);           
         }
 
@@ -91,7 +98,8 @@ namespace Pidro.Tiles
 
             try
             {
-                Pi.Gpio.Pin26.Write(true);
+               GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == relayPort);
+               p1.Write(true);
             }
             catch (Exception err)
             {
@@ -111,7 +119,8 @@ namespace Pidro.Tiles
 
             try
             {
-                Pi.Gpio.Pin26.Write(false);
+                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == relayPort);
+                p1.Write(false);
             }
             catch (Exception)
             {
@@ -134,15 +143,4 @@ namespace Pidro.Tiles
         }
 
     }
-
-    public class GpioWrapper
-    {
-        public GpioPin pin;
-
-        public override string ToString()
-        {
-            return pin.Name;
-        }
-       
-    }    
 }

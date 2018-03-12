@@ -8,7 +8,8 @@ using System.Windows.Forms;
 using System.Xml;
 using Unosquare.RaspberryIO;
 using Unosquare.RaspberryIO.Gpio;
-
+using System.Reactive.Linq;
+using Pidro.Settings;
 
 namespace Pidro.Tiles
 {
@@ -19,20 +20,30 @@ namespace Pidro.Tiles
         String address;// = "28-01161b0ab2ee";
         String name;
 
-        public TemperatureComponent(String Name,String W1Address)
+        static Object locker = new Object();
+        private W1TempItem item;
+        
+        public TemperatureComponent(W1TempItem item)
         {
-            address = W1Address;
-            name = Name;
+            this.item = item;
+            address = item.Address;
+            temperatureTile.nameLabel.Text = item.name;
 
-            temperatureTile.nameLabel.Text = Name;
-
-            //update the clock readout one a sec
-            updateTimer = new Timer();
-            updateTimer.Interval = 1000;
-            updateTimer.Tick += UpdateTimer_Tick;
-            updateTimer.Start();
+            //update the ph value, every 2 seconds,
+            IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(0), TimeSpan.FromMilliseconds(2000));
+            IDisposable disposable =
+                timer.Subscribe(x => {
+                    try
+                    {
+                        Update();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                });
         }
-        private void UpdateTimer_Tick(object sender, EventArgs e)
+
+        private void Update()
         {
             temperatureTile.Set(GetTemp().ToString("N1"));
         }
@@ -44,7 +55,7 @@ namespace Pidro.Tiles
             try
             {
                 DirectoryInfo devicesDir = new DirectoryInfo("/sys/bus/w1/devices");
-                
+
                 foreach (var deviceDir in devicesDir.EnumerateDirectories(address))
                 {
                     var w1slavetext =

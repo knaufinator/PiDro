@@ -4,13 +4,14 @@ using Mono.Nat;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-
+using System.Collections.Generic;
+using Pidro.Settings;
 
 namespace Pidro
 {
     public partial class MainWindow : Form
     {
-       // AppSettings settings = AppSettings.Instance;
+        AppSettings settings = AppSettings.Instance;
 
         //this will be in xml config later...
         //ports that will be opened up, internal for when we have multiple pis, and want to just use dif port mappings
@@ -21,34 +22,35 @@ namespace Pidro
         {
             InitializeComponent();
 
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.WindowState = FormWindowState.Maximized;
+            //this.FormBorderStyle = FormBorderStyle.None;
+            //this.WindowState = FormWindowState.Maximized;
             Size = new System.Drawing.Size(800, 480);
-           // setupUPNP();//uncomment to make upnp forward your ports
+            //setupUPNP();//uncomment to make upnp forward your ports
             //SetupWamp();//testing 
 
 
-           // ADConverter aDConverter = new ADConverter(0x48);
-            
-            //create dynamic builder, from config xml, generate each component
-            TimerComponent timerComponent = new TimerComponent(300, 5);
-            PHComponent pHComponent = new PHComponent(99,29,31);
+            //load from settings file.
+            LoadUI();
 
+
+           // ADConverter aDConverter = new ADConverter(0x48);
+
+            //create dynamic builder, from config xml, generate each component
+            //TimerComponent timerComponent = new TimerComponent("Flood Timer", 43200, 360,11);//12 hours off, 6 min on, rinse repeat
+            //PHComponent pHComponent = new PHComponent(99,29,31);
 
             // PressureComponent pressureComponent = new PressureComponent(aDConverter);
-             TemperatureComponent temperatureComponent = new TemperatureComponent("Tent", "28-0517c0d60aff");
-             TemperatureComponent temperatureComponent2 = new TemperatureComponent("Reservoir", "28-0517c0d58cff");
+            // TemperatureComponent temperatureComponent = new TemperatureComponent("Tent", "28-0517c0d60aff");
+            // TemperatureComponent temperatureComponent2 = new TemperatureComponent("Reservoir", "28-0517c0d58cff");
 
             //28-0517c0d60aff
             //28-0517c0d58cff
 
-            this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-           // this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
-            this.flowLayoutPanel1.Controls.Add(temperatureComponent2.GetTile());
-
-
+            //  this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
+            //  this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+            // this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
+            // this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
+            // this.flowLayoutPanel1.Controls.Add(temperatureComponent2.GetTile());
         }
 
         //private void SetupWamp()
@@ -113,14 +115,12 @@ namespace Pidro
                         device.DeletePortMap(portMap);
                     }
 
-
                 //add the ports we want for our IP
                 for (int i = 0; i <= 2; i++)
                 {
                     Console.WriteLine("Creating IP: " + device.LocalAddress.ToString()+ " port: " + i.ToString());
                     device.CreatePortMap(new Mapping(Protocol.Tcp, internalPorts[i], externalPorts[i]));
                 }
-                
             }
             catch (Exception e)
             {
@@ -154,6 +154,38 @@ namespace Pidro
         {
             PinTester tester = new PinTester();
             tester.Show();
+        }
+
+        private void LoadUI()
+        {
+            //we may need to dispose of the tiles free resources.
+            this.flowLayoutPanel1.Controls.Clear();
+
+            try
+            {
+                foreach (var item in settings.CurrentSettings.Components)
+                {
+                    if (item.GetType() == typeof(PHEZOItem))
+                    {
+                        PHComponent pHComponent = new PHComponent((PHEZOItem)item);
+                        this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+                    }
+                    else if (item.GetType() == typeof(W1TempItem))
+                    {
+                        TemperatureComponent pHComponent = new TemperatureComponent((W1TempItem)item);
+                        this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+                    }    
+                }
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
+            }
+        }
+
+        private void reLoadUIToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LoadUI();
         }
     }    
 }

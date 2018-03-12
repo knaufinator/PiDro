@@ -19,37 +19,28 @@ namespace Pidro.Tiles
 {
     public class PHComponent : ComponentInterface
     {
-        PHTile phTile = new PHTile();
-        int sensorId = 0;
+        private PHTile phTile = new PHTile();
 
-        int phdownHeaderPinNumber = 0;
-        int phupHeaderPinNumber = 0;
-        List<double> phHistory = new List<double>();
+        private int phdownHeaderPinNumber = 0;
+        private int phupHeaderPinNumber = 0;
+        private List<double> phHistory = new List<double>();
 
-        IDisposable subscription;
+        private IDisposable subscription;
+        private AppSettings settings = AppSettings.Instance;
+        private Boolean autoOn = false;
 
-        ADConverter aDConverter;
-        AppSettings settings = AppSettings.Instance;
-
-        Boolean autoOn = false;
-
-        int pumpOnTimeMilliSeconds = 1000;
-        int pumpAutoOnTimeMilliSeconds = 500;
-
+        private int pumpOnTimeMilliSeconds = 1000;
+        private int pumpAutoOnTimeMilliSeconds = 500;
+         
         private static I2cDriver driver;
         private static I2cDeviceConnection i2cConnection;
 
-        double targetPH = 5.75;
-        double phTolerance = .1;
-        double PH = 0;
+        private double targetPH = 5.8;
+        private double phTolerance = .1;
+        private double PH = 0;
 
-        String phNode = "PH";
-   
-        
-        public PHComponent()
-        {
-            LoadSettings();
-          
+        public PHComponent(Settings.PHEZOItem item)
+        { 
             //phTile.button1.Click += Cal_Click;
             phTile.button2.Click += Auto_Click;
             phTile.button3.Click += Up_Click;
@@ -68,25 +59,28 @@ namespace Pidro.Tiles
                     {
                     }
                 });
-        }
 
-        public PHComponent(int deviceID,int upHeaderPin, int downHeaderPin) : this()
-        {
-            phdownHeaderPinNumber = downHeaderPin;
-            phupHeaderPinNumber = upHeaderPin;
+            phdownHeaderPinNumber = item.phDownPin;
+            phupHeaderPinNumber = item.phUpPin;
 
-            GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == upHeaderPin);
-            if (p1 != null)
-                p1.PinMode = GpioPinDriveMode.Output;
-
-            GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == downHeaderPin);
-            if (p2 != null)
-                p2.PinMode = GpioPinDriveMode.Output;
+            if (item.autoPHOn)
+                EnableAutoOn();
+            else
+                DisableAutoOn();
 
             try
             {
-                driver = new I2cDriver(ProcessorPin.Gpio02, ProcessorPin.Gpio03);
-                i2cConnection = driver.Connect(0x63);
+                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber);
+                if (p1 != null)
+                    p1.PinMode = GpioPinDriveMode.Output;
+
+                GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phdownHeaderPinNumber);
+                if (p2 != null)
+                    p2.PinMode = GpioPinDriveMode.Output;
+
+                //if we ahve multiple of these does this cuase a problem?,... may need to create a global version and pass it to i2c devices
+                driver = new I2cDriver(ProcessorPin.Gpio02, ProcessorPin.Gpio03);//standard ports on raspi
+                i2cConnection = driver.Connect(item.I2cAddress);
             }
             catch
             {
@@ -94,35 +88,41 @@ namespace Pidro.Tiles
         }
 
         private void Auto_Click(object sender, EventArgs e)
-        {        
+        {
             if (autoOn == false)
-            {
-                phTile.button2.Text = "On";
-                autoOn = true;
-               
-                //sample every x seconds, if over target, apply correct dose up/down, once 
-                subscription = Observable
-                   .Interval(TimeSpan.FromSeconds(300))//5 min
-                   .Subscribe(
-                       x =>
-                       {
-                           try
-                           {
-                               CheckPHAndDose();
-                           }
-                           catch (Exception)
-                           {
-                           }
-                       });
-            }
+                EnableAutoOn();
             else
-            {
-                phTile.button2.Text = "OFF";
-                autoOn = false;
+                DisableAutoOn();
+        }
 
-                if (subscription != null)
-                    subscription.Dispose();
-            }
+        private void EnableAutoOn()
+        {
+            phTile.button2.Text = "On";
+            autoOn = true;
+
+            //sample every x seconds, if over target, apply correct dose up/down, once 
+            subscription = Observable
+                .Interval(TimeSpan.FromSeconds(300))//5 min
+                .Subscribe(
+                    x =>
+                    {
+                        try
+                        {
+                            CheckPHAndDose();
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    });            
+        }
+
+        private void DisableAutoOn()
+        {
+            phTile.button2.Text = "OFF";
+            autoOn = false;
+
+            if (subscription != null)
+                subscription.Dispose();
         }
 
         BehaviorSubject<bool> switches = new BehaviorSubject<bool>(false);
@@ -140,12 +140,6 @@ namespace Pidro.Tiles
             {
                 PHUpDose(pumpAutoOnTimeMilliSeconds);
             }
-        }
-
-        private void LoadSettings()
-        {
-            //Double.TryParse(settings.GetSetting(phNode, ph4Setting, "1.0"), out ph4);
-           // Double.TryParse(settings.GetSetting(phNode, ph7Setting, "2.0"), out ph7);
         }
         
         private void TryPinWrite(GpioPin pin, bool level)
@@ -227,7 +221,6 @@ namespace Pidro.Tiles
 
                             //global value for when the ui wants to update.
                             PH = phResult;
-
                             phTile.Set(String.Format("{0:F1}", phResult));
                         }
                         else

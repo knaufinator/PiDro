@@ -295,6 +295,9 @@
     <Compile Include="Dialogs\PinTester.Designer.cs">
       <DependentUpon>PinTester.cs</DependentUpon>
     </Compile>
+    <Compile Include="Settings\ComponentSetting.cs" />
+    <Compile Include="Settings\W1TempItem.cs" />
+    <Compile Include="Settings\PHEZOItem.cs" />
     <Compile Include="Tiles\PHTile.cs">
       <SubType>UserControl</SubType>
     </Compile>

@@ -1,7 +1,12 @@
-﻿using System;
+﻿using Pidro.Settings;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 using System.Xml;
+using System.Xml.Serialization;
 
 /// <summary>
 /// Custom settings xml writer, create and edit settings dynamically.
@@ -13,11 +18,12 @@ namespace Pidro
         private static AppSettings instance = null;
         private static readonly object padlock = new object();
 
-        private XmlDocument _settings;
-        private static String _settingsFileName = "settings.xml";
+        private static String _settingsFileName = "settings.bin";
         private String _settingsPath = Directory.GetCurrentDirectory() + "/" + _settingsFileName;
         private static String _settingNodeName = "Settings";
-
+        
+        private SettingClass currentSettings = new SettingClass();
+        
         public static AppSettings Instance
         {
             get
@@ -32,7 +38,9 @@ namespace Pidro
                 }
             }
         }
-              
+
+        public SettingClass CurrentSettings { get => currentSettings; set => currentSettings = value; }
+
         AppSettings()
         {
             try
@@ -40,126 +48,113 @@ namespace Pidro
                 //if no settings file exists, create it.
                 if (!File.Exists(_settingsPath))
                 {
-                    CreateSettings();
+                    Save();
                 }
 
                 LoadSettings();
             }
             catch (Exception e)
             {
-                Console.WriteLine("AppSettings init: "+e.Message);
+                Console.WriteLine("AppSettings init: " + e.Message);
             }
         }
 
-        private XmlNode FindNode(XmlElement list, string nodeName)
+        private void Save()
+        {
+            //save settings binary class
+            Save( _settingsPath);
+        }
+
+        private void LoadSettings()
         {
             try
             {
-                foreach (XmlNode node in list)
-                {
-                    Console.WriteLine("FindNode "+ nodeName + " next:" + node.ToString());
-                    if (node.Name.Equals(nodeName)) return node;
-                }
-
+                Stream stream = File.OpenRead(_settingsPath);
+                BinaryFormatter formatter = new BinaryFormatter();
+                CurrentSettings = (SettingClass)formatter.Deserialize(stream);
+                stream.Close();
             }
-            catch (Exception er)
+            catch (Exception err)
             {
-                Console.WriteLine("Find Node " +er.Message);
+                String test = "";
             }
+        }
+
+        public void SaveComponent(ComponentSetting item)
+        {
+            //check if exists,replace or add it.
+            ComponentSetting setting =  CurrentSettings.Components.FirstOrDefault(i => i.ID.CompareTo(item.ID) == 0);
+
+            if (setting != null)
+                CurrentSettings.Components.Remove(setting);
+
+            CurrentSettings.Components.Add(item);
             
-            return null;
+            Save();
         }
 
-        public String GetSetting(String nodeName,String attributeName,String defaultSetting)
+        public void Save(string filePath)
         {
-
-            Console.WriteLine("get Setting " + nodeName + "Settings null?: "+ (_settings == null).ToString());
-
-            String result = defaultSetting;
-            XmlNode nodeFound = FindNode(_settings[_settingNodeName], nodeName);
-            XmlAttribute xmlAttribute;
-
-            if (nodeFound != null)
+            try
             {
-                xmlAttribute = FindAttribute(nodeFound.Attributes, attributeName);
-
-                if (xmlAttribute != null)
-                    result = xmlAttribute.Value;
+                Stream stream = File.Open(filePath, FileMode.Create);
+                BinaryFormatter bformatter = new BinaryFormatter();
+                bformatter.Serialize(stream, CurrentSettings);
+                stream.Close();
             }
+            catch (Exception e) //many more exception might happen, check documentation
+            {
+                String t = "";
 
-            return result;
+            }
         }
 
-        private XmlAttribute FindAttribute(XmlAttributeCollection attributes, string attributeName)
+        /// <summary>
+        /// Deserializes an xml file into an object list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public T DeSerializeObject<T>(string fileName)
         {
-            XmlAttribute xmlAttribute = null;
+            if (string.IsNullOrEmpty(fileName)) { return default(T); }
 
-            if (attributes != null)
+            T objectOut = default(T);
+
+            try
             {
-                if (attributes[attributeName] != null)
+                XmlDocument xmlDocument = new XmlDocument();
+                xmlDocument.Load(fileName);
+                string xmlString = xmlDocument.OuterXml;
+
+                using (StringReader read = new StringReader(xmlString))
                 {
-                    xmlAttribute = attributes[attributeName];
+                    Type outType = typeof(T);
+
+                    XmlSerializer serializer = new XmlSerializer(outType);
+                    using (XmlReader reader = new XmlTextReader(read))
+                    {
+                        objectOut = (T)serializer.Deserialize(reader);
+                        reader.Close();
+                    }
+
+                    read.Close();
                 }
             }
-
-            return xmlAttribute;
-        }
-
-        private XmlNode CreateNode(String name)
-        {
-            XmlNode node = _settings.CreateNode(XmlNodeType.Element, name, null);
-            _settings[_settingNodeName].AppendChild(node);
-            return node;
-        }
-
-        private XmlAttribute CreateAttribute(XmlNode node,String name,String value)
-        {
-            XmlAttribute att = _settings.CreateAttribute(name);
-            att.Value = value;
-            node.Attributes.Append(att);
-            return att;
-        }
-        
-        private void LoadSettings()
-        {
-            _settings = new XmlDocument();
-            _settings.Load(_settingsPath);
-            Console.WriteLine(_settingsPath + " Loaded");
-        }
-
-        private void CreateSettings()
-        {
-            Console.WriteLine("Creating settings file");
-            XmlDocument settings = new XmlDocument();
-            XmlElement root = settings.CreateElement(_settingNodeName);
-            settings.AppendChild(root);      
-            settings.Save(_settingsFileName);
-            Console.WriteLine("Created settings file: "+ _settingsFileName);
-        }
-
-        internal void SaveSetting(string node, string setting, string value)
-        {
-            XmlNode settingNode = FindNode(_settings[_settingNodeName], node);
-         
-            //if node if null, create one,
-            if (settingNode == null)
+            catch (Exception ex)
             {
-                settingNode = CreateNode(node);
+                //Log exception here
             }
 
-            //find attribute on node, if null, create it
-            XmlAttribute xmlAttribute = FindAttribute(settingNode.Attributes, setting);
-            if (xmlAttribute == null)
-            {
-                xmlAttribute = CreateAttribute(settingNode, setting, value);
-            }
-
-            //set attribute value
-            xmlAttribute.Value = value;
-
-            //save settings file
-            _settings.Save(_settingsPath);
+            return objectOut;
         }
+    }
+
+    [Serializable]
+    public class SettingClass
+    {
+        private List<ComponentSetting> components = new List<ComponentSetting>();
+        public List<ComponentSetting> Components { get => components; set => components = value; }
     }
 }
 

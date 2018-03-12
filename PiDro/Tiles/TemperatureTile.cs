@@ -19,10 +19,16 @@ namespace Pidro.Tiles
             textBox1.BackColor = ComponentBase.colorPallet1;
             textBox1.ForeColor = ComponentBase.colorPallet5;
             label1.ForeColor = ComponentBase.colorPallet3;
+            nameLabel.ForeColor = ComponentBase.colorPallet3;
         }
 
         public void Set(String temperature)
         {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(Set), new object[] { temperature });
+                return;
+            }
             textBox1.Text = temperature;
         }
     }

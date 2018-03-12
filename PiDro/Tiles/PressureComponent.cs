@@ -39,8 +39,8 @@ namespace Pidro.Tiles
 
         private void LoadSettings()
         {
-            Double.TryParse(settings.GetSetting(pressureNode, pressure80Setting, "1.0"), out pressure80);
-            Double.TryParse(settings.GetSetting(pressureNode, pressure110Setting, "3.0"), out pressure110);
+          ////  Double.TryParse(settings.GetSetting(pressureNode, pressure80Setting, "1.0"), out pressure80);
+          //  Double.TryParse(settings.GetSetting(pressureNode, pressure110Setting, "3.0"), out pressure110);
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -74,12 +74,12 @@ namespace Pidro.Tiles
             if (phV >= vCutoff)
             {
                 pressure110 = phV;
-                settings.SaveSetting(pressureNode, pressure110Setting, phV.ToString());
+              //  settings.SaveSetting(pressureNode, pressure110Setting, phV.ToString());
             }
             else
             {
                 pressure80 = phV;
-                settings.SaveSetting(pressureNode, pressure80Setting, phV.ToString());
+              //  settings.SaveSetting(pressureNode, pressure80Setting, phV.ToString());
             }
         }
 

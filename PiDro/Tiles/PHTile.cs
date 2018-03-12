@@ -11,8 +11,7 @@ using System.Windows.Forms;
 namespace Pidro.Tiles
 {
     public partial class PHTile : UserControl
-    {
-      
+    {     
         public PHTile()
         {
             InitializeComponent();
@@ -32,8 +31,5 @@ namespace Pidro.Tiles
             }
             textBox1.Text = value;
         }
-        
-      
-        
     }
 }

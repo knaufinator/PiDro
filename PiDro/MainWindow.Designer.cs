@@ -33,8 +33,9 @@
             this.closeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.arcTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.pinTestToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.reLoadUIToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,7 +58,8 @@
             this.closeToolStripMenuItem,
             this.settingsToolStripMenuItem,
             this.arcTestToolStripMenuItem,
-            this.pinTestToolStripMenuItem});
+            this.pinTestToolStripMenuItem,
+            this.reLoadUIToolStripMenuItem});
             this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(64, 36);
@@ -66,23 +68,30 @@
             // closeToolStripMenuItem
             // 
             this.closeToolStripMenuItem.Name = "closeToolStripMenuItem";
-            this.closeToolStripMenuItem.Size = new System.Drawing.Size(176, 36);
+            this.closeToolStripMenuItem.Size = new System.Drawing.Size(196, 36);
             this.closeToolStripMenuItem.Text = "Close";
             this.closeToolStripMenuItem.Click += new System.EventHandler(this.closeToolStripMenuItem_Click);
             // 
             // settingsToolStripMenuItem
             // 
             this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(176, 36);
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(196, 36);
             this.settingsToolStripMenuItem.Text = "Settings";
             this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // arcTestToolStripMenuItem
             // 
             this.arcTestToolStripMenuItem.Name = "arcTestToolStripMenuItem";
-            this.arcTestToolStripMenuItem.Size = new System.Drawing.Size(176, 36);
+            this.arcTestToolStripMenuItem.Size = new System.Drawing.Size(196, 36);
             this.arcTestToolStripMenuItem.Text = "Arc Test";
             this.arcTestToolStripMenuItem.Click += new System.EventHandler(this.arcTestToolStripMenuItem_Click);
+            // 
+            // pinTestToolStripMenuItem
+            // 
+            this.pinTestToolStripMenuItem.Name = "pinTestToolStripMenuItem";
+            this.pinTestToolStripMenuItem.Size = new System.Drawing.Size(196, 36);
+            this.pinTestToolStripMenuItem.Text = "Pin Test";
+            this.pinTestToolStripMenuItem.Click += new System.EventHandler(this.pinTestToolStripMenuItem_Click);
             // 
             // flowLayoutPanel1
             // 
@@ -92,12 +101,12 @@
             this.flowLayoutPanel1.Size = new System.Drawing.Size(800, 440);
             this.flowLayoutPanel1.TabIndex = 0;
             // 
-            // pinTestToolStripMenuItem
+            // reLoadUIToolStripMenuItem
             // 
-            this.pinTestToolStripMenuItem.Name = "pinTestToolStripMenuItem";
-            this.pinTestToolStripMenuItem.Size = new System.Drawing.Size(176, 36);
-            this.pinTestToolStripMenuItem.Text = "Pin Test";
-            this.pinTestToolStripMenuItem.Click += new System.EventHandler(this.pinTestToolStripMenuItem_Click);
+            this.reLoadUIToolStripMenuItem.Name = "reLoadUIToolStripMenuItem";
+            this.reLoadUIToolStripMenuItem.Size = new System.Drawing.Size(196, 36);
+            this.reLoadUIToolStripMenuItem.Text = "ReLoad UI";
+            this.reLoadUIToolStripMenuItem.Click += new System.EventHandler(this.reLoadUIToolStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -127,6 +136,7 @@
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem arcTestToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem pinTestToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reLoadUIToolStripMenuItem;
     }
 }
 
