@@ -33,10 +33,14 @@ namespace Pidro.Dialogs
         {
             //clear list
             settingsList.Clear();
-            
+
+            AppSettings.Instance.LoadSettings();
+          
             //get settings
-           // settingsList = settings.GetSettings();
-           // listBox1.DataSource = settingsList;
+            settingsList = AppSettings.Instance.CurrentSettings.Components;
+
+            listBox1.DataSource = null;
+            listBox1.DataSource = settingsList;
         }
 
 
@@ -60,23 +64,14 @@ namespace Pidro.Dialogs
             Guid id = Guid.NewGuid();
             String idStr = id.ToString();
 
-            //add setting for this 
-
             PHEZOItem item = new PHEZOItem(i2cAddressInt, phUpPinInt, phDownPinInt, name, id, checkBox1.Checked);
             settings.SaveComponent(item);
-            //settings.SaveSetting(idStr, "Name", name);
-            //settings.SaveSetting(idStr, "Type", "PHEZO");
-            //settings.SaveSetting(idStr, "PHI2cAddress", i2cAddressInt.ToString());
-            //settings.SaveSetting(idStr, "PHUpPin", phUpPinInt.ToString());
-            //settings.SaveSetting(idStr, "PHDownPin", phDownPinInt.ToString());
-            //settings.SaveSetting(idStr, "AutoOn", checkBox1.Checked.ToString());
-
             LoadSettings();
         }
 
         private void button12_Click(object sender, EventArgs e)
         {
-
+            LoadSettings();
         }
 
         private void button6_Click(object sender, EventArgs e)
@@ -94,7 +89,7 @@ namespace Pidro.Dialogs
         {
             //add w1 temp component
             String name = textBox8.Text;
-            String address = textBox8.Text;
+            String address = textBox6.Text;
 
             Guid id = Guid.NewGuid();
             String idStr = id.ToString();
@@ -102,6 +97,54 @@ namespace Pidro.Dialogs
             W1TempItem item = new W1TempItem(address, name, id);
             settings.SaveComponent(item);
 
+            LoadSettings();
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //take params ask user if OK
+            //add setting if ok
+            String adcI2cAddressStr = textBox12.Text;
+            String adcPortStr = textBox15.Text;
+            String phUpPinStrInt = textBox14.Text;
+            String phDownPinStrInt = textBox13.Text;
+            String name = textBox10.Text;
+
+            String ph4VStr = textBox5.Text;
+            String ph7VStr = textBox4.Text;
+
+            int adcI2cAddressInt = 0;
+            int phUpPinInt = 0;
+            int phDownPinInt = 0;
+            int adcPortInt = 0;
+            Double ph4V = 0;
+            Double ph7V = 0;
+
+            int.TryParse(adcI2cAddressStr, out adcI2cAddressInt);
+            int.TryParse(phUpPinStrInt, out phUpPinInt);
+            int.TryParse(phDownPinStrInt, out phDownPinInt);
+            int.TryParse(adcPortStr, out adcPortInt);
+
+            Double.TryParse(ph4VStr, out ph4V);
+            Double.TryParse(ph7VStr, out ph7V);
+
+            Guid id = Guid.NewGuid();
+            String idStr = id.ToString();
+
+            PHAnalogItem item = new PHAnalogItem(adcI2cAddressInt,adcPortInt, phUpPinInt, phDownPinInt, name, id, checkBox1.Checked, ph4V, ph7V);
+            settings.SaveComponent(item);
+            LoadSettings();
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            //cear settings
+            settings.ClearSettings();
             LoadSettings();
         }
     }

@@ -27,13 +27,13 @@ namespace Pidro
             Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
             //SetupWamp();//testing 
-
-
+           
+          
             //load from settings file.
             LoadUI();
 
 
-           // ADConverter aDConverter = new ADConverter(0x48);
+            // ADConverter aDConverter = new ADConverter(0x48);
 
             //create dynamic builder, from config xml, generate each component
             //TimerComponent timerComponent = new TimerComponent("Flood Timer", 43200, 360,11);//12 hours off, 6 min on, rinse repeat
@@ -43,14 +43,10 @@ namespace Pidro
             // TemperatureComponent temperatureComponent = new TemperatureComponent("Tent", "28-0517c0d60aff");
             // TemperatureComponent temperatureComponent2 = new TemperatureComponent("Reservoir", "28-0517c0d58cff");
 
-            //28-0517c0d60aff
-            //28-0517c0d58cff
-
-            //  this.flowLayoutPanel1.Controls.Add(timerComponent.GetTile());
-            //  this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-            // this.flowLayoutPanel1.Controls.Add(pressureComponent.GetTile());
-            // this.flowLayoutPanel1.Controls.Add(temperatureComponent.GetTile());
-            // this.flowLayoutPanel1.Controls.Add(temperatureComponent2.GetTile());
+            //28-01161b0ab2ee
+            //28-01161b0ab2ee - hydra 1
+            //28-0517c0d60aff -h2
+            //28-0517c0d58cff -h2
         }
 
         //private void SetupWamp()
@@ -170,11 +166,16 @@ namespace Pidro
                         PHComponent pHComponent = new PHComponent((PHEZOItem)item);
                         this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
                     }
+                    else if (item.GetType() == typeof(PHAnalogItem))
+                    {
+                        PHComponent pHComponent = new PHComponent((PHAnalogItem)item);
+                        this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
+                    }
                     else if (item.GetType() == typeof(W1TempItem))
                     {
-                        TemperatureComponent pHComponent = new TemperatureComponent((W1TempItem)item);
-                        this.flowLayoutPanel1.Controls.Add(pHComponent.GetTile());
-                    }    
+                        TemperatureComponent tempComponent = new TemperatureComponent((W1TempItem)item);
+                        this.flowLayoutPanel1.Controls.Add(tempComponent.GetTile());
+                    }
                 }
             }
             catch (Exception err)

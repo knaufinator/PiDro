@@ -9,7 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 
 /// <summary>
-/// Custom settings xml writer, create and edit settings dynamically.
+/// settings, saved as binary file.
 /// </summary>
 namespace Pidro
 {
@@ -22,7 +22,7 @@ namespace Pidro
         private String _settingsPath = Directory.GetCurrentDirectory() + "/" + _settingsFileName;
         private static String _settingNodeName = "Settings";
         
-        private SettingClass currentSettings = new SettingClass();
+        private static SettingClass currentSettings = new SettingClass();
         
         public static AppSettings Instance
         {
@@ -59,17 +59,19 @@ namespace Pidro
             }
         }
 
-        private void Save()
-        {
-            //save settings binary class
+        public void Save()
+        {           
             Save( _settingsPath);
         }
 
-        private void LoadSettings()
+        public void LoadSettings()
         {
             try
             {
                 Stream stream = File.OpenRead(_settingsPath);
+
+                Console.WriteLine(_settingsPath + " Opened");
+
                 BinaryFormatter formatter = new BinaryFormatter();
                 CurrentSettings = (SettingClass)formatter.Deserialize(stream);
                 stream.Close();
@@ -83,12 +85,12 @@ namespace Pidro
         public void SaveComponent(ComponentSetting item)
         {
             //check if exists,replace or add it.
-            ComponentSetting setting =  CurrentSettings.Components.FirstOrDefault(i => i.ID.CompareTo(item.ID) == 0);
+            ComponentSetting setting = currentSettings.Components.FirstOrDefault(i => i.ID.CompareTo(item.ID) == 0);
 
             if (setting != null)
-                CurrentSettings.Components.Remove(setting);
+                currentSettings.Components.Remove(setting);
 
-            CurrentSettings.Components.Add(item);
+            currentSettings.Components.Add(item);
             
             Save();
         }
@@ -148,6 +150,12 @@ namespace Pidro
 
             return objectOut;
         }
+
+        internal void ClearSettings()
+        {
+            CurrentSettings.Components.Clear();
+            Save();
+        }
     }
 
     [Serializable]
@@ -155,6 +163,11 @@ namespace Pidro
     {
         private List<ComponentSetting> components = new List<ComponentSetting>();
         public List<ComponentSetting> Components { get => components; set => components = value; }
+
+        internal object GetComponent(Guid iD)
+        {
+            return components.FirstOrDefault(i => i.ID == iD);
+        }
     }
 }
 
