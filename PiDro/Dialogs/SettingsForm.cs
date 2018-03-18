@@ -80,7 +80,7 @@ namespace Pidro.Dialogs
             var item = listBox1.SelectedItem;
             Guid id = ((ComponentSetting)item).ID;
 
-            //settings.DeleteSetting(id);
+            settings.DeleteSetting(id);
             
             LoadSettings();
         }

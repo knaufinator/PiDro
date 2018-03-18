@@ -27,23 +27,10 @@ namespace Pidro
             Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
             //SetupWamp();//testing 
-           
-          
+
             //load from settings file.
             LoadUI();
-
-
-            // ADConverter aDConverter = new ADConverter(0x48);
-
-            //create dynamic builder, from config xml, generate each component
-            //TimerComponent timerComponent = new TimerComponent("Flood Timer", 43200, 360,11);//12 hours off, 6 min on, rinse repeat
-            //PHComponent pHComponent = new PHComponent(99,29,31);
-
-            // PressureComponent pressureComponent = new PressureComponent(aDConverter);
-            // TemperatureComponent temperatureComponent = new TemperatureComponent("Tent", "28-0517c0d60aff");
-            // TemperatureComponent temperatureComponent2 = new TemperatureComponent("Reservoir", "28-0517c0d58cff");
-
-            //28-01161b0ab2ee
+    
             //28-01161b0ab2ee - hydra 1
             //28-0517c0d60aff -h2
             //28-0517c0d58cff -h2
@@ -83,7 +70,6 @@ namespace Pidro
         //        String test = "";
         //    }
         //}
-
 
         private void CloseButton_Click(object sender, EventArgs e)
         {
@@ -154,9 +140,14 @@ namespace Pidro
 
         private void LoadUI()
         {
-            //we may need to dispose of the tiles free resources.
-            this.flowLayoutPanel1.Controls.Clear();
 
+           //clear current, and dispose em
+            Control.ControlCollection ct = flowLayoutPanel1.Controls;
+            this.flowLayoutPanel1.Controls.Clear();
+            foreach (Control c in ct)
+                c.Dispose();
+
+            //re- add from settings
             try
             {
                 foreach (var item in settings.CurrentSettings.Components)
@@ -176,6 +167,10 @@ namespace Pidro
                         TemperatureComponent tempComponent = new TemperatureComponent((W1TempItem)item);
                         this.flowLayoutPanel1.Controls.Add(tempComponent.GetTile());
                     }
+
+
+
+
                 }
             }
             catch (Exception err)

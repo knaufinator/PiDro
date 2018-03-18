@@ -95,6 +95,17 @@ namespace Pidro
             Save();
         }
 
+        public void DeleteSetting(Guid id)
+        {
+           var setting =  currentSettings.Components.FirstOrDefault(i => i.ID == id);
+
+            if(setting != null)
+            {
+                currentSettings.Components.Remove(setting);
+                Save();
+            }
+        }
+
         public void Save(string filePath)
         {
             try

@@ -48,20 +48,7 @@ namespace Pidro.Tiles
             phTile.button4.Click += Down_Click;
             phTile.label2.Text = targetPH.ToString();
 
-            try
-            {
-                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber);
-                if (p1 != null)
-                    p1.PinMode = GpioPinDriveMode.Output;
-
-                GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phdownHeaderPinNumber);
-                if (p2 != null)
-                    p2.PinMode = GpioPinDriveMode.Output;
-            }
-            catch
-            {
-            }
-
+          
             //update the ph value, every 2 seconds,
             IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(2000));
             IDisposable disposable =
@@ -83,6 +70,21 @@ namespace Pidro.Tiles
 
             phdownHeaderPinNumber = item.phDownPin;
             phupHeaderPinNumber = item.phUpPin;
+
+            try
+            {
+                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber);
+                if (p1 != null)
+                    p1.PinMode = GpioPinDriveMode.Output;
+
+                GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phdownHeaderPinNumber);
+                if (p2 != null)
+                    p2.PinMode = GpioPinDriveMode.Output;
+            }
+            catch
+            {
+            }
+
 
             if (item.autoPHOn)
                 EnableAutoOn();
@@ -108,6 +110,21 @@ namespace Pidro.Tiles
             sensorId = item.adcPort;
             ID = item.ID;
 
+            try
+            {
+                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phupHeaderPinNumber);
+                if (p1 != null)
+                    p1.PinMode = GpioPinDriveMode.Output;
+
+                GpioPin p2 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == phdownHeaderPinNumber);
+                if (p2 != null)
+                    p2.PinMode = GpioPinDriveMode.Output;
+            }
+            catch
+            {
+            }
+
+
             if (item.autoPHOn)
                 EnableAutoOn();
             else
@@ -115,11 +132,6 @@ namespace Pidro.Tiles
             try
             {
                 aDConverter = new ADConverter(0x48);
-               // myDevice = Pi.I2C.AddDevice(0x48);//72
-                // myDevice = Pi.I2C.AddDevice(item.analogAddress);//72
-             
-                // driver = new I2cDriver(ProcessorPin.Gpio02, ProcessorPin.Gpio03);//standard ports on raspi
-               // i2cConnection = driver.Connect(item.analogAddress);
             }
             catch (Exception e)
             {
@@ -143,20 +155,12 @@ namespace Pidro.Tiles
         {
             PHAnalogItem setting = (PHAnalogItem) settings.CurrentSettings.GetComponent(ID);
 
-            string test = "";
-
-            setting.ph7Voltage = 3;
-
-            settings.Save();
-
-            return;
-
             if (setting != null)
             {
                 Double phV = aDConverter.GetADVoltage(sensorId);
                 Double vCutoff = 1.5;
 
-                if (phV >= vCutoff)
+                if (phV <= vCutoff)
                     setting.ph4Voltage = phV;
                 else
                     setting.ph7Voltage = phV;
@@ -242,6 +246,7 @@ namespace Pidro.Tiles
         {
             try
             {
+                pin.PinMode = GpioPinDriveMode.Output;
                 pin.Write(level);
             }
             catch (Exception)
