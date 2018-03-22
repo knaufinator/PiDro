@@ -1,4 +1,5 @@
-﻿using Pidro.Tiles;
+﻿using Pidro.Settings;
+using Pidro.Tiles;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -26,27 +27,18 @@ namespace Pidro.Tiles
         private int triggerOnTimeSec;
 
         private int relayPort;
-        //GpioPin p1;// = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == upHeaderPin);
+        private TimerRelayTile item;
 
-        public TimerComponent(String Name, int triggerDelaySec,int triggerOnTimeSec, int acRelayPort)
+        public TimerComponent(IntervalRelayItem intervalRelayItem)
         {
-            trPanel = new TimerRelayTile(Name);
-            relayPort = acRelayPort;
+            trPanel = new TimerRelayTile(intervalRelayItem.name);
+            relayPort = intervalRelayItem.relayPin;
 
-            this.triggerDelaySec = triggerDelaySec;
-            this.triggerOnTimeSec = triggerOnTimeSec;
+            this.triggerDelaySec = intervalRelayItem.timeOffSec;
+            this.triggerOnTimeSec = intervalRelayItem.timeOnSec;
 
             this.triggerDelaySecSpan = new TimeSpan(0, 0, triggerDelaySec);
             this.triggerOnTimeSecSpan = new TimeSpan(0, 0, triggerOnTimeSec);
-
-            try
-            {
-                Pi.Gpio.Pin26.PinMode = GpioPinDriveMode.Output;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Timer Relay Pin setup Failed: " + e.Message);
-            }
 
             //update the clock readout one a sec
             updateTimer = new Timer();
@@ -98,8 +90,9 @@ namespace Pidro.Tiles
 
             try
             {
-               GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == relayPort);
-               p1.Write(true);
+                GpioPin p1 = Pi.Gpio.Pins.FirstOrDefault(i => i.HeaderPinNumber == relayPort);
+                p1.PinMode = GpioPinDriveMode.Output;
+                p1.Write(true);
             }
             catch (Exception err)
             {

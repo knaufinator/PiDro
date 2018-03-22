@@ -10,7 +10,7 @@ namespace Pidro.Settings
     [Serializable]
     public class PHAnalogItem : ComponentSetting
     {
-        public int analogAddress;
+        public int adcAddress;
         public int phUpPin;
         public int phDownPin;
         public String name;
@@ -19,14 +19,15 @@ namespace Pidro.Settings
 
         public double ph4Voltage;
         public double ph7Voltage;
+        public int phIntervalMS;
 
         public PHAnalogItem()
         {
         }
 
-        public PHAnalogItem(int analogAddress,int adcPort, int phUpPin,int phDownPin,String name,Guid ID,bool autoPHOn,Double ph4,Double ph7)
+        public PHAnalogItem(int adcAddress, int adcPort, int phUpPin,int phDownPin,String name,Guid ID,bool autoPHOn,Double ph4,Double ph7, int phIntervalMS)
         {
-            this.analogAddress = analogAddress;
+            this.adcAddress = adcAddress;
             this.phUpPin = phUpPin;
             this.phDownPin = phDownPin;
             this.name = name;
@@ -36,6 +37,7 @@ namespace Pidro.Settings
 
             this.ph4Voltage = ph4;
             this.ph7Voltage = ph7;
+            this.phIntervalMS = phIntervalMS;
         }
 
         public Guid GetID()

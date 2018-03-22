@@ -62,7 +62,6 @@ namespace Pidro.Dialogs
             int.TryParse(phDownPinStrInt, out phDownPinInt);
             
             Guid id = Guid.NewGuid();
-            String idStr = id.ToString();
 
             PHEZOItem item = new PHEZOItem(i2cAddressInt, phUpPinInt, phDownPinInt, name, id, checkBox1.Checked);
             settings.SaveComponent(item);
@@ -92,8 +91,6 @@ namespace Pidro.Dialogs
             String address = textBox6.Text;
 
             Guid id = Guid.NewGuid();
-            String idStr = id.ToString();
-
             W1TempItem item = new W1TempItem(address, name, id);
             settings.SaveComponent(item);
 
@@ -134,9 +131,8 @@ namespace Pidro.Dialogs
             Double.TryParse(ph7VStr, out ph7V);
 
             Guid id = Guid.NewGuid();
-            String idStr = id.ToString();
 
-            PHAnalogItem item = new PHAnalogItem(adcI2cAddressInt,adcPortInt, phUpPinInt, phDownPinInt, name, id, checkBox1.Checked, ph4V, ph7V);
+            PHAnalogItem item = new PHAnalogItem(adcI2cAddressInt,adcPortInt, phUpPinInt, phDownPinInt, name, id, checkBox1.Checked, ph4V, ph7V,1000);
             settings.SaveComponent(item);
             LoadSettings();
         }
@@ -145,6 +141,42 @@ namespace Pidro.Dialogs
         {
             //cear settings
             settings.ClearSettings();
+            LoadSettings();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            string name = textBox9.Text;
+            string relayPinStr = textBox7.Text;
+            Guid id = Guid.NewGuid();
+            string timeOffSecStr = textBox16.Text;
+            string timeOnSecStr = textBox17.Text;
+
+            int relayPin = 0;
+            int timeOffSec = 0;
+            int timeOnSec = 0;
+
+            int.TryParse(relayPinStr, out relayPin);
+            int.TryParse(timeOnSecStr, out timeOnSec);
+            int.TryParse(timeOffSecStr, out timeOffSec);
+
+            IntervalRelayItem item = new IntervalRelayItem(relayPin,name,timeOnSec, timeOffSec, id);
+            settings.SaveComponent(item);
+            LoadSettings();
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            string name = textBox10.Text;
+            string adcAddressStr = textBox18.Text;
+            Guid id = Guid.NewGuid();
+
+            int adcAddress;
+
+            int.TryParse(adcAddressStr, out adcAddress);
+
+            PressureItem item = new PressureItem(adcAddress, name, 3, 1, id);
+            settings.SaveComponent(item);
             LoadSettings();
         }
     }

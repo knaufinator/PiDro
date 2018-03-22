@@ -11,6 +11,7 @@ using RaspberrySharp.IO.InterIntegratedCircuit;
 using RaspberrySharp.IO.GeneralPurpose;
 using Pidro.Tools;
 using Pidro.Settings;
+using System.Windows.Forms;
 
 namespace Pidro.Tiles
 {
@@ -30,7 +31,7 @@ namespace Pidro.Tiles
         private Boolean autoOn = false;
 
         private int pumpOnTimeMilliSeconds = 1000;
-        private int pumpAutoOnTimeMilliSeconds = 400;
+        private int pumpAutoOnTimeMilliSeconds = 500;
          
         private I2cDriver driver;//ezo
         private I2cDeviceConnection i2cConnection;
@@ -38,7 +39,7 @@ namespace Pidro.Tiles
         ADConverter aDConverter;
         private int sensorId;
         private double targetPH = 5.8;
-        private double phTolerance = .1;
+        private double phTolerance = .15;
         
         public PHComponent() 
         {
@@ -48,7 +49,6 @@ namespace Pidro.Tiles
             phTile.button4.Click += Down_Click;
             phTile.label2.Text = targetPH.ToString();
 
-          
             //update the ph value, every 2 seconds,
             IObservable<long> timer = Observable.Timer(TimeSpan.FromMilliseconds(100), TimeSpan.FromMilliseconds(2000));
             IDisposable disposable =
@@ -131,7 +131,7 @@ namespace Pidro.Tiles
                 DisableAutoOn();
             try
             {
-                aDConverter = new ADConverter(0x48);
+                aDConverter = new ADConverter(item.adcAddress);
             }
             catch (Exception e)
             {
@@ -161,9 +161,22 @@ namespace Pidro.Tiles
                 Double vCutoff = 1.5;
 
                 if (phV <= vCutoff)
-                    setting.ph4Voltage = phV;
+                {
+                    if (MessageBox.Show("4 PH ? @ " + phV.ToString() + "V", "Calibrate 4 PH", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    {
+                        setting.ph4Voltage = phV;
+                        settings.Save();
+                    }
+                }
                 else
-                    setting.ph7Voltage = phV;
+                {
+                    if (MessageBox.Show("7 PH ? @ " + phV.ToString() + "V", "Calibrate 70 PH", MessageBoxButtons.OKCancel) == DialogResult.OK)
+                    {
+                        setting.ph7Voltage = phV;
+                        settings.Save();
+                    }
+                }
+                
 
                 settings.Save();
             }
@@ -232,7 +245,7 @@ namespace Pidro.Tiles
                     double m = p.Item2;
 
                     //y = mx + c;
-                    result = m * aDConverter.GetADVoltage(0) + c;    
+                    result = m * aDConverter.GetADVoltage(sensorId) + c;    
                 }
                 catch (Exception e)
                 {
@@ -351,7 +364,7 @@ namespace Pidro.Tiles
                 phHistory.RemoveAt(0);
             }
 
-            phTile.Set(String.Format("{0:F1}", phResult));
+            phTile.Set(String.Format("{0:F2}", phResult));
         }
 
         public System.Windows.Forms.Control GetTile()

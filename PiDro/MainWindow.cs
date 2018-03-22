@@ -22,8 +22,8 @@ namespace Pidro
         {
             InitializeComponent();
 
-            //this.FormBorderStyle = FormBorderStyle.None;
-            //this.WindowState = FormWindowState.Maximized;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
             Size = new System.Drawing.Size(800, 480);
             //setupUPNP();//uncomment to make upnp forward your ports
             //SetupWamp();//testing 
@@ -167,9 +167,16 @@ namespace Pidro
                         TemperatureComponent tempComponent = new TemperatureComponent((W1TempItem)item);
                         this.flowLayoutPanel1.Controls.Add(tempComponent.GetTile());
                     }
-
-
-
+                    else if (item.GetType() == typeof(IntervalRelayItem))
+                    {
+                        TimerComponent tempComponent = new TimerComponent((IntervalRelayItem)item);
+                        this.flowLayoutPanel1.Controls.Add(tempComponent.GetTile());
+                    }
+                    else if (item.GetType() == typeof(PressureItem))
+                    {
+                        PressureComponent tempComponent = new PressureComponent((PressureItem)item);
+                        this.flowLayoutPanel1.Controls.Add(tempComponent.GetTile());
+                    }
 
                 }
             }

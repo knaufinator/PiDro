@@ -56,9 +56,9 @@ namespace Pidro.Tiles
             {
                 DirectoryInfo devicesDir = new DirectoryInfo("/sys/bus/w1/devices");
 
-                Console.WriteLine("dir " + devicesDir.FullName);
+              //  Console.WriteLine("dir " + devicesDir.FullName);
 
-                Console.WriteLine("Address -" + address);
+                //Console.WriteLine("Address -" + address);
                 foreach (var deviceDir in devicesDir.EnumerateDirectories(address))
                 {
                     var w1slavetext =
@@ -66,7 +66,7 @@ namespace Pidro.Tiles
                     string temptext =
                         w1slavetext.Split(new string[] { "t=" }, StringSplitOptions.RemoveEmptyEntries)[1];
 
-                    Console.WriteLine("temp " + temptext);
+                  //  Console.WriteLine("temp " + temptext);
 
                     result = ConvertTemp.ConvertCelsiusToFahrenheit(double.Parse(temptext) / 1000); ;
 

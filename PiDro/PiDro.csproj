@@ -296,6 +296,8 @@
       <DependentUpon>PinTester.cs</DependentUpon>
     </Compile>
     <Compile Include="Settings\ComponentSetting.cs" />
+    <Compile Include="Settings\PressureItem.cs" />
+    <Compile Include="Settings\IntervalRelayItem.cs" />
     <Compile Include="Settings\PHAnalogItem.cs" />
     <Compile Include="Settings\W1TempItem.cs" />
     <Compile Include="Settings\PHEZOItem.cs" />
